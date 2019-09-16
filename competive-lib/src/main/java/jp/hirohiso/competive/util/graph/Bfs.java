@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Bsf {
+public class Bfs {
 
     public static void main(String[] args) {
 
