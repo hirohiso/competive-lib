@@ -6,43 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Dfs {
+public class Bsf {
 
     public static void main(String[] args) {
-        // TODO 自動生成されたメソッド・スタブ
 
     }
-
-    //深さ優先探索（再帰版）
-    private static Set<Node> visitedRecursive = new HashSet<>();
-    public static void dfsRecursive(Node root){
-
-        //ルートを探索済みにする
-        visitedRecursive.add(root);
-        //未訪問の隣接ノードを取得する
-        //隣接ノードを取得
-        List<Node> temp = root.getLinkedNodes();
-
-        //未訪問の隣接ノードを取得
-        List<Node> nextNodes = new LinkedList<>();
-        for (Node n : temp) {
-            if (!visitedRecursive.contains(n)) {
-                //未訪問だけ積める
-                nextNodes.add(n);
-            }
-        }
-
-        //未訪問のノードを再帰探索する
-        for(Node n : nextNodes){
-            dfsRecursive(n);
-        }
-    }
-
     //深さ優先探索
     public static void dfs(Node root) {
         //探索済み
         Set<Node> visited = new HashSet<>();
-        //スタック
+        //キュー
         Deque<Node> stack = new LinkedList<>();
 
         //ルートを探索済みにして、スタックに積む
@@ -50,7 +23,7 @@ public class Dfs {
         stack.addLast(root);
 
         Node target;
-        while ((target = stack.pollLast()) != null) {
+        while ((target = stack.pollFirst()) != null) {
             //隣接ノードを取得
             List<Node> temp = target.getLinkedNodes();
 
@@ -89,5 +62,4 @@ public class Dfs {
         }
 
     }
-
 }
