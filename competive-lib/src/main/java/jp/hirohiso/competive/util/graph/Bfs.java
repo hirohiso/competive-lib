@@ -11,19 +11,19 @@ public class Bfs {
     public static void main(String[] args) {
 
     }
-    //深さ優先探索
+    //幅優先探索
     public static void dfs(Node root) {
         //探索済み
         Set<Node> visited = new HashSet<>();
         //キュー
-        Deque<Node> stack = new LinkedList<>();
+        Deque<Node> queue = new LinkedList<>();
 
-        //ルートを探索済みにして、スタックに積む
+        //ルートを探索済みにして、キューに積む
         visited.add(root);
-        stack.addLast(root);
+        queue.addLast(root);
 
         Node target;
-        while ((target = stack.pollFirst()) != null) {
+        while ((target = queue.pollFirst()) != null) {
             //隣接ノードを取得
             List<Node> temp = target.getLinkedNodes();
 
@@ -39,9 +39,9 @@ public class Bfs {
 
 
             for (Node n : nextNodes) {
-                //未訪問ノードを全てスタックに積む
+                //未訪問ノードを全てキューに積む
                 visited.add(n);
-                stack.addLast(n);
+                queue.addLast(n);
                 //のちのち構築した木に親子の関係をしたい場合
                 //ここで子に対して、親の参照を貼っとく
             }
