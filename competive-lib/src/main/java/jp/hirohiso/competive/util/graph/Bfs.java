@@ -46,7 +46,6 @@ public class Bfs {
                 //ここで子に対して、親の参照を貼っとく
             }
         }
-
     }
 
     public static class Node {

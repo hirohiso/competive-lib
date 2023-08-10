@@ -3,6 +3,8 @@ package jp.hirohiso.competive.util.math;
 public class Combination {
 
     public static void main(String[] args) {
+        COMinit();
+        System.out.println(inv[2]);
 
     }
     static int MAX = 4000;
