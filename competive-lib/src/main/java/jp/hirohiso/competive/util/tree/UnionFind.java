@@ -1,9 +1,64 @@
 package jp.hirohiso.competive.util.tree;
 
+import java.util.Arrays;
+
 public class UnionFind {
 
     public static void main(String[] args) {
         // TODO 自動生成されたメソッド・スタブ
+
+    }
+
+    //ALC準拠
+    public static class DisjointSetUnion {
+        int size;
+        int[] parentsOrSize;
+
+        public DisjointSetUnion(int size) {
+            this.size = size;
+            this.parentsOrSize = new int[size];
+            Arrays.fill(parentsOrSize, -1);
+        }
+
+        public int mergeSet(int x, int y) {
+            int i = root(x);
+            int j = root(y);
+
+            if (i == j) {
+                return i;
+            }
+            //iのサイズが大きくなるように入れ替える
+            if (-parentsOrSize[i] < -parentsOrSize[j]) {
+                var temp = i;
+                i = j;
+                j = temp;
+            }
+            //iを代表としてxをマージする
+            parentsOrSize[i] += parentsOrSize[j];
+            parentsOrSize[j] = i;
+            return i;
+        }
+
+        public int root(int x) {
+            if (parentsOrSize[x] < 0) {
+                return x;
+            }
+            parentsOrSize[x] = root(parentsOrSize[x]);
+            return parentsOrSize[x];
+        }
+
+        public boolean isSameSet(int x, int y) {
+            return root(x) == root(y);
+        }
+
+        public int size(int x){
+            return -parentsOrSize[root(x)];
+        }
+
+        @Override
+        public String toString() {
+            return this.parentsOrSize.toString();
+        }
 
     }
 

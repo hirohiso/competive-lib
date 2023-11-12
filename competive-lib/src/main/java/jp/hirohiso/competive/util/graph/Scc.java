@@ -6,14 +6,24 @@ import java.util.stream.Collectors;
 public class Scc {
 
     public static void main(String[] args) {
-        SccSolver sccSolver = new SccSolver(5);
+        SccSolver sccSolver = new SccSolver(11);
         sccSolver.addDirectEdge(0, 1);
-        sccSolver.addDirectEdge(1, 0);
         sccSolver.addDirectEdge(1, 2);
+        sccSolver.addDirectEdge(1, 3);
+        sccSolver.addDirectEdge(2, 0);
         sccSolver.addDirectEdge(2, 4);
-        sccSolver.addDirectEdge(4, 3);
-        sccSolver.addDirectEdge(3, 2);
+        sccSolver.addDirectEdge(3, 3);
+        sccSolver.addDirectEdge(3, 5);
+        sccSolver.addDirectEdge(4, 5);
+        sccSolver.addDirectEdge(5, 7);
+        sccSolver.addDirectEdge(7, 6);
+        sccSolver.addDirectEdge(6, 5);
+        sccSolver.addDirectEdge(6, 8);
+        sccSolver.addDirectEdge(8, 6);
+        sccSolver.addDirectEdge(9, 10);
+        sccSolver.addDirectEdge(10, 9);
         sccSolver.solve();
+        sccSolver.getResultScc();
     }
 
 
@@ -60,7 +70,22 @@ public class Scc {
                 number++;
                 rdfs(k, checked2);
             }
+
             System.out.println(Arrays.toString(componetns));
+        }
+
+        public List<List<Integer>> getResultScc() {
+            //トポロジカルソート
+            var max = Arrays.stream(componetns).max().getAsInt();
+            var scc = new ArrayList<List<Integer>>(max);
+            for (int i = 0; i < max; i++) {
+                scc.add(new LinkedList<>());
+            }
+            for (int i = 0; i < componetns.length; i++) {
+                scc.get(componetns[i] - 1).add(i);
+            }
+            System.out.println(scc);
+            return scc;
         }
 
         private void dfs(int now, boolean checked[]) {

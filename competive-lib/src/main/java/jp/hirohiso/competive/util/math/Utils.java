@@ -3,20 +3,19 @@ package jp.hirohiso.competive.util.math;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 public class Utils {
     public static void main(String[] args) {
-        BinaryHelper binaryHelper = new BinaryHelper(1,5);
+        BinaryHelper binaryHelper = new BinaryHelper(0, 1, i -> i <= 1);
 
-        System.out.println(binaryHelper.mid());
-        binaryHelper.contains(true);
-        System.out.println(binaryHelper.mid());
-        binaryHelper.contains(false);
-        System.out.println(binaryHelper.mid());
-        binaryHelper.contains(true);
+        System.out.println(binaryHelper.search());
+
+        var array = new int[]{1,3,5,7,9};
+        System.out.println(binarySearchNearest(array,6));
     }
 
-    //一番近い値を返却する
+    //与えられた数を下限として、一番近い値を返却する
     public static int binarySearchNearest(int[] array, int key) {
         int i = Arrays.binarySearch(array, key);
         //変換
@@ -33,10 +32,21 @@ public class Utils {
         private int high;
         private int mid;
 
-        public BinaryHelper(int l, int h) {
+        private Predicate<Integer> predicate;
+
+        public BinaryHelper(int l, int h, Predicate<Integer> p) {
             low = l;
             high = h;
             mid = (low + high) / 2;
+            predicate = p;
+        }
+
+        // 範囲 真偽 からもっとも偽に近い真の値を返す。
+        public int search() {
+            while (hasNext()) {
+                contains(predicate.test(mid()));
+            }
+            return low;
         }
 
         public int mid() {
@@ -59,7 +69,7 @@ public class Utils {
     }
 
     //尺取り法　ベース
-    public static void syakutori(){
+    public static void syakutori() {
         //尺取り法
         int start = 0;
         int end = 1;
@@ -73,7 +83,7 @@ public class Utils {
             //条件内
 
             //start,endが末尾まで達して進められなくなった場合は探索を終える
-            if (false){
+            if (false) {
                 break;
             }
         }

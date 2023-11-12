@@ -5,12 +5,23 @@ import java.util.Arrays;
 
 public class MyPermutation {
     public static void main(String[] args){
-        int[] arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        int[] arr = new int[]{1,2,3,4,5,6,7,8,9};
 
         do{
             //System.out.println(Arrays.toString(arr));
         }while (intNextPermutation(arr));
 
+        int bit = (1 << 3)-1;
+        for (; bit < (1 << 5); bit = nextCombination(bit)) {
+            System.out.println(bit);
+        }
+    }
+
+    public static int nextCombination(int sub){
+        var least = sub & -sub;
+        var left =  sub + least;
+        var right = (((sub & ~left))/least) >> 1;
+        return left | right;
     }
 
     public static boolean intNextPermutation(int[] arr){

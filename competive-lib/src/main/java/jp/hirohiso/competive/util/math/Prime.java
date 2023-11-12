@@ -19,7 +19,8 @@ public class Prime {
     public static boolean[] prime(int n) {
         boolean[] result = new boolean[n + 1];
         Arrays.fill(result, true);
-
+        result[0] = false;
+        result[1] = false;
         for (int i = 2; i < Math.sqrt(n); i++) {
             if (result[i] == false) {
                 continue;
