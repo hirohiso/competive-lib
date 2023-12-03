@@ -1,6 +1,8 @@
 package jp.hirohiso.competive.util.math;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class StaticMatrixRangeSumSolve {
     public static void main(String[] args) {
@@ -23,14 +25,25 @@ public class StaticMatrixRangeSumSolve {
         private long[][] acc;
 
         public StaticMatrixRangeSum(int[][] array) {
-            acc = new long[array.length + 1][array[0].length + 1];
-            for (int i = 0; i < array.length; i++) {
-                for (int j = 0; j < array[i].length; j++) {
-                    acc[i + 1][j + 1] = acc[i + 1][j] + acc[i][j + 1] - acc[i][j] + array[i][j];
+            BiFunction<Integer,Integer,Long> function = (i,j) -> (long)array[i][j];
+            new StaticMatrixRangeSum(array.length,array[0].length,function);
+        }
+        public StaticMatrixRangeSum(long[][] array) {
+            BiFunction<Integer,Integer,Long> function = (i,j) -> array[i][j];
+            new StaticMatrixRangeSum(array.length,array[0].length,function);
+        }
+
+        public StaticMatrixRangeSum(int n, int m, BiFunction<Integer,Integer,Long> function){
+            acc = new long[n + 1][m + 1];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    acc[i + 1][j + 1] = acc[i + 1][j] + acc[i][j + 1] - acc[i][j] + function.apply(i,j);
                 }
                 System.out.println(Arrays.toString(acc[i + 1]));
             }
+
         }
+
 
         /**
          * [(x1,y1),(x2-1,y2-2)]の区間和を求める

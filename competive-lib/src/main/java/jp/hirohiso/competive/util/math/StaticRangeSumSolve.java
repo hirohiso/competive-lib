@@ -1,5 +1,9 @@
 package jp.hirohiso.competive.util.math;
 
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+
 public class StaticRangeSumSolve {
     public static void main(String[] args) {
         var array = new int[]{1,2,3,4,5,6,7,8,9,10};
@@ -14,9 +18,18 @@ public class StaticRangeSumSolve {
     public static class RangeSum{
         private long[] acc;
         public RangeSum(int[] array){
-            acc = new long[ array.length + 1];
-            for (int i = 0; i < array.length; i++) {
-                acc[i + 1] = acc[i] + array[i];
+            Function<Integer,Long> func = i -> (long) array[i];
+            new RangeSum(array.length, func);
+        }
+        public RangeSum(long[] array){
+            Function<Integer,Long> func = i -> (long) array[i];
+            new RangeSum(array.length, func);
+        }
+
+        public RangeSum(int size, Function<Integer,Long> operator){
+            acc = new long[ size + 1];
+            for (int i = 0; i < size; i++) {
+                acc[i + 1] = acc[i] + operator.apply(i);
             }
         }
 
