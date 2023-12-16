@@ -4,7 +4,7 @@ public class ModLong {
 
     public static void main(String[] args) {
         LongMod longMod = new LongMod(10444, (long)1e9 + 7);
-        System.out.println(longMod.t(1234).x(1234).t(-12344).x(123434567).v());
+        System.out.println(longMod.plus(1234).multi(1234).plus(-12344).multi(123434567).v());
     }
 
     public static class LongMod{
@@ -16,13 +16,13 @@ public class ModLong {
             this.M = M;
         }
 
-        public LongMod t(long t){
+        public LongMod plus(long t){
             result += t;
             result %= M;
             return this;
         }
 
-        public LongMod x(long t){
+        public LongMod multi(long t){
             result *= t;
             result %= M;
             return this;
