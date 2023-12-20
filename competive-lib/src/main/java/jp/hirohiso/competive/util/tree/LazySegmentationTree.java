@@ -1,5 +1,6 @@
 package jp.hirohiso.competive.util.tree;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -11,6 +12,7 @@ public class LazySegmentationTree {
 
         //区間中の最大値を計算
         //区間計算は値の足し算
+        //区間加算操作・区間最大値取得
         LazySegmentTree<Integer, Integer> st = new LazySegmentTree<>(
                 new Integer[]{1, 1, 2, 3, 5, 8, 13},
                 (i, j) -> Math.max(i, j),
@@ -24,7 +26,7 @@ public class LazySegmentationTree {
         System.out.println("区間[0,7):" + st.getRange(0, 7));
         System.out.println("区間[0,6):" + st.getRange(0, 6));
         System.out.println("区間[2,5):" + st.getRange(2, 5));
-        st.apply(0,1, 5);
+        st.apply(0, 1, 5);
         System.out.println("区間[0,0):" + st.getRange(0, 1));
         System.out.println("区間[0,7):" + st.getRange(0, 7));
         System.out.println("区間[0,6):" + st.getRange(0, 6));
@@ -35,9 +37,44 @@ public class LazySegmentationTree {
         System.out.println("区間[0,6):" + st.getRange(0, 6));
         System.out.println("区間[2,5):" + st.getRange(2, 5));
 
+        System.out.println("---------------------");
+
+        //区間加算操作・区間和取得
+        var sum = new LazySegmentTree<Pair, Integer>(
+                new Pair[]{
+                        new Pair(1, 1),
+                        new Pair(3, 1),
+                        new Pair(2, 1),
+                        new Pair(4, 1),
+                        new Pair(3, 1),
+                        new Pair(5, 1),
+                },
+                (p, q) -> new Pair(p.v + q.v, p.n + q.n),
+                (i, p) -> new Pair(p.v + p.n * i, p.n),
+                (i, j) -> i + j,
+                () -> new Pair(0, 1),
+                () -> 0
+        );
+        System.out.println("区間[0,0):" + sum.getRange(0, 1).v);
+        System.out.println("区間[0,4):" + sum.getRange(0, 4).v);
+        System.out.println("区間[2,6):" + sum.getRange(2, 6).v);
+        System.out.println("区間[6,8):" + sum.getRange(6, 8).v);
+        sum.apply(0, 8, 10);
+        sum.apply(0, 4, 100);
+        System.out.println("区間[0,0):" + sum.getRange(0, 1).v);
+        System.out.println("区間[0,4):" + sum.getRange(0, 4).v);
+        System.out.println("区間[2,6):" + sum.getRange(2, 6).v);
+        System.out.println("区間[6,8):" + sum.getRange(6, 8).v);
     }
 
+    record Pair(int v, int n) {
+    }
+
+    ;
+
     //遅延評価セグメンテーション木
+    //T : Data
+    //U : Lazy
     public static class LazySegmentTree<T, U> {
         //配列
         private Object[] array, lazy;
@@ -46,7 +83,9 @@ public class LazySegmentationTree {
         //集約関数
         private BinaryOperator<T> operator;
         //遅延評価関数<U,Tを受取>
+        //Tに対して遅延値Uを作用させて値を更新する
         private BiFunction<U, T, T> mapping;
+        //遅延値Uの加算
         private BinaryOperator<U> composition;
 
         //初期化関数T
