@@ -7,6 +7,16 @@ import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
 public class LazySegmentationTree {
+    /*
+    「セグ木に乗る」とは
+    やりたい演算がセグメント木に乗るとか乗らないとかいう話は、
+    結局のところこれらの関数 op mapping composition を適切に定義できるかどうか？という点に尽きます。単位元と恒等写像はどうにでもなるので。
+    op は通常のセグメント木にも存在する取得クエリの演算で、これが結合法則を満たすことがまず必要です。この説明はこちらの記事に詳しく書いています。
+
+    遅延伝播を行う時にはそれに加えて、以下の2つの性質を満たすような関数を見つける必要があります。
+    mapping：操作を、全てのノードが持つ data に同じ計算式で作用させることができること。このとき区間幅など必要な情報を data 側に持たせて補うのはOK。
+    composition：複数の操作を連続して行うという操作（合成写像）を、あたかも1回の操作であるかのように扱って lazy に持たせることができること。
+     */
 
     public static void main(String[] args) {
 
