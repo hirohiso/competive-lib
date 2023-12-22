@@ -19,6 +19,7 @@ public class RollingHashMain {
     public static class RollingHash{
         private long b = 3491;
         private long m = 999999937;
+        private char zero = 'a';
 
 
         //strのハッシュ値を返す
@@ -28,7 +29,7 @@ public class RollingHashMain {
             for (int i = 0; i < size; i++) {
                 hash *= b;
                 hash %= m;
-                hash += (str.charAt(i) - 'a');
+                hash += (str.charAt(i) - zero);
                 hash %= m;
             }
             return hash;
@@ -72,18 +73,18 @@ public class RollingHashMain {
                                 for (int i = 0; i < size; i++) {
                                     hash *= b;
                                     hash %= m;
-                                    hash += (str.charAt(i) - 'a');
+                                    hash += (str.charAt(i) - zero);
                                     hash %= m;
                                 }
                                 return hash;
                             }
-                            var h=(long)(str.charAt(now -1) - 'a');
+                            var h=(long)(str.charAt(now -1) - zero);
                             h *= bsize;
                             h %= m;
                             hash -=h;
                             hash *= b;
                             hash %= m;
-                            hash += (str.charAt(now + (size -1)) - 'a');
+                            hash += (str.charAt(now + (size -1)) - zero);
                             hash %= m;
                             return hash;
                         }
