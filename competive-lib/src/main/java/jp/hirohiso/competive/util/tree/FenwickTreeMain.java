@@ -17,17 +17,31 @@ public class FenwickTreeMain {
 
     private static class IntFenwickTree {
         private final int[] arr;
+        private final int size;
 
         IntFenwickTree(int N) {
-            this.arr = new int[N];
+            this.arr = new int[N + 1];
+            this.size = N;
         }
 
+        /**
+         *
+         * @param x 1 <= x <= N
+         * @param v
+         */
         void update(int x, int v) {
-            for (int i = x; i <= arr.length; i += i & -i) {
+            int i = x;
+            while (i <= size) {
                 arr[i] += v;
+                i += i & -i;
             }
         }
 
+        /**
+         *
+         * @param i 1 <= i <= N
+         * @return
+         */
         int sum(int i) {
             var s = 0;
             while (i > 0) {
@@ -70,12 +84,21 @@ public class FenwickTreeMain {
             this.e = e;
         }
 
+        /**
+         *
+         * @param x 1 <= x <= N
+         * @param v
+         */
         void update(int x, T v) {
             for (int i = x; i <= arr.length; i += i & -i) {
                 arr[i] = add.apply((T) arr[i], v);
             }
         }
 
+        /**
+         *
+         * @param i 1 <= i <= N
+         */
         T sum(int i) {
             var s = e.get();
             while (i > 0) {
