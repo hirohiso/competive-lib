@@ -23,7 +23,8 @@ public class Scc {
         sccSolver.addDirectEdge(9, 10);
         sccSolver.addDirectEdge(10, 9);
         sccSolver.solve();
-        sccSolver.getResultScc();
+        var scc = sccSolver.getResultScc();
+        System.out.println(scc);
     }
 
 
@@ -70,8 +71,6 @@ public class Scc {
                 number++;
                 rdfs(k, checked2);
             }
-
-            System.out.println(Arrays.toString(componetns));
         }
 
         public List<List<Integer>> getResultScc() {
@@ -84,7 +83,6 @@ public class Scc {
             for (int i = 0; i < componetns.length; i++) {
                 scc.get(componetns[i] - 1).add(i);
             }
-            System.out.println(scc);
             return scc;
         }
 
