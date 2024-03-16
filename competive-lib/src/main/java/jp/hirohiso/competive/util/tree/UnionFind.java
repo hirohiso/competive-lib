@@ -1,6 +1,10 @@
 package jp.hirohiso.competive.util.tree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class UnionFind {
 
@@ -53,6 +57,11 @@ public class UnionFind {
 
         public int size(int x){
             return -parentsOrSize[root(x)];
+        }
+
+        public List<List<Integer>> groups(){
+            var map = IntStream.range(0,size).boxed().collect(Collectors.groupingBy( i -> root(i)));
+            return map.values().stream().toList();
         }
 
         @Override
