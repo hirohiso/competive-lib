@@ -11,6 +11,7 @@ public class MyPermutation {
             //System.out.println(Arrays.toString(arr));
         }while (intNextPermutation(arr));
 
+        //5つの中から３つを選ぶ
         int bit = (1 << 3)-1;
         for (; bit < (1 << 5); bit = nextCombination(bit)) {
             System.out.println(bit);
