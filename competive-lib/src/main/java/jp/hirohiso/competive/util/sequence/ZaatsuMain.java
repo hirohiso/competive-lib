@@ -11,16 +11,22 @@ public class ZaatsuMain {
     }
 
 
-    private static int[] arrayComp(long[] arr){
-        var result = new int[arr.length];
+    private static long[] arrayComp(long[] arr){
+        var result = new long[arr.length];
         var temp = new long[arr.length][2];
         for (int i = 0; i < arr.length; i++) {
             temp[i][0] = i;
             temp[i][1] = arr[i];
         }
         Arrays.sort(temp, Comparator.comparing(i -> i[1]));
+        var rank = -1;
         for (int i = 0; i < temp.length; i++) {
-            result[(int)temp[i][0]] = i;
+            if (i == 0) {
+                rank = 0;
+            } else {
+                rank = temp[i][1] == temp[i - 1][1] ? rank : rank + 1;
+            }
+            result[(int) temp[i][0]] = rank;
         }
         return result;
     }
