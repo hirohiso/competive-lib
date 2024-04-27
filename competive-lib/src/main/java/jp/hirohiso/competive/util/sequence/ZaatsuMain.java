@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 public class ZaatsuMain {
     public static void main(String[] args) {
-        var temp = new long[]{1245,23,46959865,2,-6,325,6,1000000};
+        var temp = new long[]{1245,23,46959865,2,-6,325,6,1000000,6,123,23};
         System.out.println(Arrays.toString(temp));
         System.out.println(Arrays.toString(arrayComp(temp)));
     }
