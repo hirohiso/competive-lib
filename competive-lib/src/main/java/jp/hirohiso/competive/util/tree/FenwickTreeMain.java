@@ -6,13 +6,24 @@ import java.util.function.*;
 public class FenwickTreeMain {
     public static void main(String[] args) {
         var ft = new FenwickTree<Integer>(10, (i, j) -> i + j, i -> -i, () -> 0);
+        //ft.update(0, 1);
+        ft.update(1, 2);
         ft.update(2, 10);
         ft.update(5, 5);
+        System.out.println(ft.sum(0));
+        System.out.println(ft.sum(1));
         System.out.println(ft.sum(3));
         System.out.println(ft.sum(6));
         ft.update(3, -6);
         System.out.println(ft.sum(6));
         System.out.println(ft.range(4, 6));
+
+        System.out.println("=======");
+        var bit = new IntFenwickTree(5);
+        System.out.println(bit.sum(0));
+        System.out.println(bit.sum(3));
+        System.out.println(bit.sum(5));
+        System.out.println(bit.sum(6));
     }
 
     private static class IntFenwickTree {
