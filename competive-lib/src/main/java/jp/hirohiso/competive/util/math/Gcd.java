@@ -85,9 +85,7 @@ public class Gcd {
                 }
                 x = (x * x) % m;
                 n >>= 1;
-
             }
-
             return result;
         }
     }

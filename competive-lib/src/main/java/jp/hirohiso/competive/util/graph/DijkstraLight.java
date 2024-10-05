@@ -22,6 +22,7 @@ public class DijkstraLight {
     }
 
     //有向グラフ版お手軽ダイクストラ
+    //O(E + V log V)
     public static class Dijkstra {
         private int size = 0;
         private long[] disitance;
@@ -49,19 +50,19 @@ public class DijkstraLight {
                     : e1.distans > e2.distans ? 1 : 0;
             PriorityQueue<DistansNodeSet> pq = new PriorityQueue<>(comp);
             pq.add(DistansNodeSet.of(0, root));
-            while(!pq.isEmpty()){
+            while (!pq.isEmpty()) {
                 DistansNodeSet pair = pq.poll();
                 int n = pair.getNode();
 
-                if(this.disitance[n] < pair.getDistans()){
+                if (this.disitance[n] < pair.getDistans()) {
                     continue;
                 }
-                for(Edge e:this.edgeList[n]){
+                for (Edge e : this.edgeList[n]) {
                     int node = e.otherNode;
                     long cost = e.cost;
-                    long newCost = this.disitance[n] +cost;
+                    long newCost = this.disitance[n] + cost;
 
-                    if(this.disitance[node] > newCost){
+                    if (this.disitance[node] > newCost) {
                         updateDistance(node, newCost);
                         pq.add(DistansNodeSet.of(newCost, node));
                     }

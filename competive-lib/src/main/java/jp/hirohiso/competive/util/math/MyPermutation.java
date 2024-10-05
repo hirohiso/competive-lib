@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public class MyPermutation {
     public static void main(String[] args){
-        int[] arr = new int[]{1,2,3,4,5,6,7,8,9};
+        int[] arr = new int[]{1,3,3,3,4};
 
         do{
-            //System.out.println(Arrays.toString(arr));
+            System.out.println(Arrays.toString(arr));
         }while (intNextPermutation(arr));
 
         //5つの中から３つを選ぶ
@@ -25,6 +25,9 @@ public class MyPermutation {
         return left | right;
     }
 
+    //パーミュテーション
+    //最初に並び替えをして利用すること
+    //要素が重複している場合でも、重複したパターンが実行されることはない。
     public static boolean intNextPermutation(int[] arr){
         int size = arr.length;
         for (int i = size - 2; i >=0; i--) {
@@ -33,14 +36,14 @@ public class MyPermutation {
                 do{
                     j--;
                 }while (!(arr[i] < arr[j]));
-                int temp = arr[i];
+                var temp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = temp;
                 Arrays.sort(arr,i+1,size);
                 return true;
             }
             if(i == 0){
-                int[] temp = Arrays.copyOf(arr,size);
+                var temp = Arrays.copyOf(arr,size);
                 for (int j = 0; j < size; j++) {
                     arr[j] = temp[(size-1) -j];
                 }

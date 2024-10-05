@@ -60,6 +60,13 @@ public class SparseTableMain {
             }
         }
 
+        /**
+         * [l,r)のクエリ処理。
+         * @param l　含む 1<=
+         * @param r　含まない　<= N
+         * @return
+         */
+
         public T query(int l, int r) {
             var length = r - l;
             return ope.apply(

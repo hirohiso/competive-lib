@@ -7,7 +7,7 @@ public class NumberSequence {
  * 　等差数列
  *
  * @param a0 初項
- * @param d  　公差
+ * @param d  項差
  */
 record ArithmeticSequence(long a0, long d) {
     //n項目までの和
