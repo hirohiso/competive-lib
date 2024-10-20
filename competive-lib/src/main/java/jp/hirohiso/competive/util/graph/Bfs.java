@@ -1,16 +1,35 @@
 package jp.hirohiso.competive.util.graph;
 
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Bfs {
 
     public static void main(String[] args) {
 
     }
+    record BfsSolver(boolean[] visited) {
+        public int[] bfs(int now, ArrayList<LinkedList<Integer>> list) {
+            var ret = new int[list.size()];
+            Arrays.fill(ret,-1);
+
+            var q = new LinkedList<Integer>();
+            q.addLast(now);
+            ret[now] = 0;
+            while (!q.isEmpty()){
+                var n = q.pollFirst();
+                for(var next : list.get(n)){
+                    if(visited[next]){
+                        continue;
+                    }
+                    visited[next] = true;
+                    ret[next] += ret[n] + 1;//levelを保持
+                    q.addLast(next);
+                }
+            }
+            return ret;
+        }
+    }
+
     //幅優先探索
     public static void dfs(Node root) {
         //探索済み

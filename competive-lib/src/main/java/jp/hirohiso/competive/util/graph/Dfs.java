@@ -13,6 +13,15 @@ public class Dfs {
 
     }
 
+
+    record   DfsSolver(boolean[] visited){
+        public void dfs(int now) {
+        }
+
+        private void innerDfs(int now){
+        }
+    }
+
     //深さ優先探索（再帰版）
     private static Set<Node> visitedRecursive = new HashSet<>();
     public static void dfsRecursive(Node root){
