@@ -1,6 +1,8 @@
 package jp.hirohiso.competive.util.range;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class RangeSetMain {
@@ -21,17 +23,17 @@ public class RangeSetMain {
         System.out.println(rangeSet);
         rangeSet.insert(new Range(9, 100));
         System.out.println(rangeSet);
-        rangeSet.remove(new Range( 10 ,15));
+        rangeSet.remove(new Range(10, 15));
         System.out.println(rangeSet);
-        rangeSet.remove(new Range( 20 ,21));
-        rangeSet.remove(new Range( 23 ,27));
-        rangeSet.remove(new Range( 30 ,35));
+        rangeSet.remove(new Range(20, 21));
+        rangeSet.remove(new Range(23, 27));
+        rangeSet.remove(new Range(30, 35));
         System.out.println(rangeSet);
-        rangeSet.remove(new Range( 13 ,18));
+        rangeSet.remove(new Range(13, 18));
         System.out.println(rangeSet);
-        rangeSet.remove(new Range( 25 ,28));
+        rangeSet.remove(new Range(25, 28));
         System.out.println(rangeSet);
-        rangeSet.remove(new Range( 20 ,35));
+        System.out.println(rangeSet.remove(new Range(20, 35)));
         System.out.println(rangeSet);
     }
 }
@@ -84,12 +86,14 @@ class RangeSet {
         set.add(range);
     }
 
-    public void remove(Range range) {
+    public Set<Range> remove(Range range) {
         var pre = set.floor(new Range(range.l(), range.l()));
         var next = set.higher(new Range(range.r(), range.r()));
 
         var sub = set.subSet(pre, true, next, false);
         var list = sub.stream().toList();
+
+        var ret = new HashSet<Range>();
         for (var ran : list) {
             var maxl = Math.max(ran.l(), range.l());
             var minr = Math.min(ran.r(), range.r());
@@ -98,13 +102,19 @@ class RangeSet {
                 if (ran.l() < range.l() && range.r() < ran.r()) {
                     set.add(new Range(ran.l(), range.l()));
                     set.add(new Range(range.r(), ran.r()));
+                    ret.add(new Range(range.l(), range.r()));
                 } else if (ran.l() < range.l()) {
                     set.add(new Range(ran.l(), range.l()));
+                    ret.add(new Range(range.l(), ran.r()));
                 } else if (range.r() < ran.r()) {
                     set.add(new Range(range.r(), ran.r()));
+                    ret.add(new Range(ran.l(), range.r()));
+                }else{
+                    ret.add(new Range(ran.l(), ran.r()));
                 }
             }
         }
+        return ret;
     }
 
     @Override
