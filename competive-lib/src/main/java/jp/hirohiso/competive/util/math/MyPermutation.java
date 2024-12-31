@@ -28,6 +28,9 @@ public class MyPermutation {
     //パーミュテーション
     //最初に並び替えをして利用すること
     //要素が重複している場合でも、重複したパターンが実行されることはない。
+
+    //参考:
+    //https://ngtkana.hatenablog.com/entry/2021/11/08/000209?_gl=1*rzimq9*_gcl_au*ODMyMjk1MTkuMTY5OTAxODAzOA..
     public static boolean intNextPermutation(int[] arr){
         int size = arr.length;
         for (int i = size - 2; i >=0; i--) {

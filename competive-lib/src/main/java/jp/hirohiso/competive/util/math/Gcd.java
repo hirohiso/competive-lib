@@ -41,12 +41,18 @@ public class Gcd {
 
         //最大公約数
         static long gcd(long a, long b) {
+            if (a == 0 || b == 0) {
+                if (a == b) {
+                    throw new ArithmeticException();
+                }
+                return Math.abs(a + b);
+            }
             long temp;
             while ((temp = a % b) != 0) {
                 a = b;
                 b = temp;
             }
-            return (long) b;
+            return Math.abs(b);
         }
 
         //拡張ユークリッド互除法
