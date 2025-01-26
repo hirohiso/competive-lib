@@ -5,19 +5,29 @@ import java.util.Arrays;
 
 public class ExtraCombinationMain {
     public static void main(String[] args) {
-        var nk = new ElementsByKGroup(10, 4, false,
+        var nk = new ElementsByKGroup(10, 4, true,
                 arr -> System.out.println(Arrays.toString(arr))
         );
         nk.solve();
 
 
-        var bell = new DistinctElementsByKGroup(5, 3, false,
+
+        var bell = new DistinctElementsByKGroup(5, 5, true,
                 list -> {
                     list.stream().forEach(i ->
                             System.out.print(Integer.toBinaryString(i) + " "));
                     System.out.println();
                 });
         bell.solve();
+
+        {
+            var ans = new int[]{0};
+            var temp = new ElementsByKGroup(50, 50, true,
+                    arr -> ans[0]++
+            );
+            temp.solve();
+            System.out.println(ans[0]);
+        }
     }
 
 
