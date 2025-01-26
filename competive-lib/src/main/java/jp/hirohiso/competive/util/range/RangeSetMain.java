@@ -65,6 +65,28 @@ class RangeSet {
         }
     }
 
+    public Range getLeft(long x){
+        var r = new Range(x, x);
+        var pre = set.headSet(r,true).descendingSet();
+        for(var range : pre){
+            if(range.r() <= x){
+                return range;
+            }
+        }
+        return null;
+    }
+    public Range getRight(long x){
+        var r = new Range(x, x);
+        var pre = set.tailSet(r,false);
+        for(var range : pre){
+            if(range.l() > x){
+                return range;
+            }
+        }
+        return null;
+    }
+
+
     //rangeを追加する
     public void insert(Range range) {
         var pre = set.floor(range);
