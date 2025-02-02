@@ -6,7 +6,9 @@ public class Combination {
         COMinit();
         System.out.println(inv[2]);
 
+        System.out.println(COM(8, 3));
     }
+
     static int MAX = 4000;
     static int MOD = 1000_000_007;
     static long fac[] = new long[MAX];

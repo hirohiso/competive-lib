@@ -4,20 +4,21 @@ import java.util.Arrays;
 
 public class NksuffleMain {
     public static void main(String[] args) {
-        int[] array = {1, 2, 3, 4, 5, 6};
-        int k = 2;
+        int[] array = {1, 2, 3, 4, 5, 6, 7};
+        int k = 3;
 
         do {
             System.out.println("Updated array: " + Arrays.toString(array));
         } while (ShuffleUtil.nextShuffle(array, k));
 
         //
-        var arr = new int[100000];
+        var arr = new int[6];
         Arrays.setAll(arr, i -> i);
         var ans = 0;
         do {
             ans++;
-        } while (ShuffleUtil.nextShuffle(arr, 1));
+            System.out.println("Updated array: " + Arrays.toString(arr));
+        } while (ShuffleUtil.nextShuffle(arr, 4));
         System.out.println(ans);
     }
 }
@@ -53,21 +54,16 @@ class ShuffleUtil {
         if (j == -1) {
             return false;
         }
-
         // スワップ
         swap(array, i, j);
-
         // スワップの長さ計算
         int swapLen = Math.min(k - (i + 1), n - k - (j - k + 1));
-
         // 部分スワップ
-        swapSubArrays(array, k - swapLen, k, j, j + swapLen);
-
+        swapSubArrays(array, k - swapLen, j + 1, swapLen);
         // 左側を左回転
-        rotateLeft(array, i + 1, k - (i + 1 + swapLen));
-
+        rotateLeft(array, i + 1, swapLen, k);
         // 右側を右回転
-        rotateRight(array, k + j - k + swapLen, n - k - (j - k + swapLen));
+        rotateRight(array, j + 1, swapLen);
 
         return true;
     }
@@ -78,24 +74,26 @@ class ShuffleUtil {
         array[j] = temp;
     }
 
-    private static void swapSubArrays(int[] array, int start1, int end1, int start2, int end2) {
-        for (int i = 0; i < (end1 - start1); i++) {
+    private static void swapSubArrays(int[] array, int start1, int start2, int len) {
+        for (int i = 0; i < len; i++) {
             swap(array, start1 + i, start2 + i);
         }
     }
 
-    private static void rotateLeft(int[] array, int start, int distance) {
+    private static void rotateLeft(int[] array, int start, int distance, int k) {
         if (distance <= 0) return;
-        int[] temp = Arrays.copyOfRange(array, start, start + distance);
-        System.arraycopy(array, start + distance, array, start, array.length - start - distance);
-        System.arraycopy(temp, 0, array, array.length - distance, temp.length);
+        int[] temp1 = Arrays.copyOfRange(array, start, k - distance);
+        int[] temp2 = Arrays.copyOfRange(array, k - distance, k);
+        System.arraycopy(temp2, 0, array, start, temp2.length);
+        System.arraycopy(temp1, 0, array, start + temp2.length, temp1.length);
     }
 
     private static void rotateRight(int[] array, int start, int distance) {
         if (distance <= 0) return;
-        int[] temp = Arrays.copyOfRange(array, array.length - distance, array.length);
-        System.arraycopy(array, start, array, start + distance, array.length - start - distance);
-        System.arraycopy(temp, 0, array, start, temp.length);
+        int[] temp1 = Arrays.copyOfRange(array, start + distance, array.length);
+        int[] temp2 = Arrays.copyOfRange(array, start, start + distance);
+        System.arraycopy(temp1, 0, array, start, temp1.length);
+        System.arraycopy(temp2, 0, array, start + temp1.length, temp2.length);
     }
 
     public static void main(String[] args) {

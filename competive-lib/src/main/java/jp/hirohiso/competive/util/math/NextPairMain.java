@@ -171,7 +171,6 @@ public class NextPairMain {
             //subGroup内の開始要素はusedInSubGroup.previousSetBit()
             //Group内の開始要素はusedInSGroup.previousSetBit()
             //でアクセスできる
-
         }
         return false;
     }
@@ -211,6 +210,103 @@ public class NextPairMain {
                         }
                         return true;
                     }
+                }
+                return false;
+            };
+        }
+
+        //m1組をk1組,m2組をk2組・・・・作る組み合わせを辞書順列挙するジェネレーター
+        //groups[]{m1,m1,...,m1,m2,m2...,m3,.......,mi,mi,,,,,,,mi}
+        public static Func generator(int[] groups){
+            var group = new BitSet();
+            var subgroup = new BitSet();
+
+            var now = 0;
+            group.set(now);
+            subgroup.set(now);
+            for (int i = 1; i < groups.length; i++) {
+                now += groups[i];
+                subgroup.set(now);
+                if(groups[i] != groups[i -1]){
+                    group.set(now);
+                }
+            }
+
+            return (arr) ->{
+                var groupStart = group;
+                var subgroupStart = subgroup;
+
+                var n = arr.length;
+                var usedInAll = new BitSet(n);
+                var usedInGroup = new BitSet(n);
+                var usedInSubGroup = new BitSet(n);
+
+                //ルール
+                //subGroup内では入れ替えない
+                //subGroup間では入れ替えが可能
+                //Group間でも入れ替えが可能
+                //subGroup内は昇順に並んでいる
+                //Group内ではsubGroupの開始要素が昇順に並んでいる
+                for (int i = n - 1; i >= 0; i--) {
+                    usedInSubGroup.set(arr[i], true);
+                    //swapするさいの参照先
+                    if (subgroupStart.get(i)) {
+                        //Groupの開始要素:
+                        //同一Groupではない自分より後ろで自分よりも大きな要素集合を参照
+                        //subGroupの開始要素:
+                        //同一Groupではない自分より後ろで自分よりも大きな要素集合を参照
+                        if (arr[i] < usedInAll.nextSetBit(arr[i])) {
+                            arr[i] = usedInAll.nextSetBit(arr[i]);
+                            usedInAll.set(arr[i], false);
+                            usedInAll.or(usedInGroup);
+                            usedInAll.or(usedInSubGroup);
+                        } else {
+                            usedInGroup.or(usedInSubGroup);
+                            usedInSubGroup.clear();
+                            if (groupStart.get(i)) {
+                                usedInAll.or(usedInGroup);
+                                usedInGroup.clear();
+                            }
+                            continue;
+                        }
+                    } else {
+                        //その他の要素:
+                        //同一subGroupではない自分より後ろで自分より大きな要素集合を参照
+                        if (arr[i] < usedInGroup.nextSetBit(arr[i]) || arr[i] < usedInAll.nextSetBit(arr[i])) {
+                            usedInAll.or(usedInGroup);
+                            arr[i] = usedInAll.nextSetBit(arr[i]);
+                            usedInAll.set(arr[i], false);
+                            usedInAll.or(usedInSubGroup);
+                        } else {
+                            continue;
+                        }
+                    }
+                    //swapした後の動き
+                    //swapした要素をkとする
+                    //subGroup内ではkより大きい値を昇順で埋めいく
+                    var j = i + 1;
+                    var k = subgroupStart.previousSetBit(i);
+                    for (;(!subgroupStart.get(j)) && j < n; j++) {
+                        arr[j] = usedInAll.nextSetBit(arr[j - 1]);
+                        usedInAll.set(arr[j], false);
+                    }
+                    //Group内ではkのsubGroupの開始要素lより大きい要素を昇順で埋めていく
+                    for (; (!groupStart.get(j)) && j < n; j++) {
+                        arr[j] = usedInAll.nextSetBit(arr[k]);
+                        if(arr[j] == -1){
+                            System.out.println(Arrays.toString(arr));
+                        }
+                        usedInAll.set(arr[j], false);
+                    }
+                    //別なGroupは残りの要素を昇順で埋めていく
+                    for (; j < n; j++) {
+                        arr[j] = usedInAll.nextSetBit(0);
+                        usedInAll.set(arr[j], false);
+                    }
+                    return true;
+                    //subGroup内の開始要素はusedInSubGroup.previousSetBit()
+                    //Group内の開始要素はusedInSGroup.previousSetBit()
+                    //でアクセスできる
                 }
                 return false;
             };
