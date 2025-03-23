@@ -4,20 +4,21 @@ import java.util.function.*;
 
 public class FenwickTreeMain {
     public static void main(String[] args) {
-        var ft = new GenericFenwickTree<Integer>(10, (i, j) -> i + j, i -> -i, () -> 0);
+        var ft = new GenericFenwickTree<Integer>(6, (i, j) -> i + j, i -> -i, () -> 0);
         //ft.update(0, 1);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 3; i++) {
             System.out.println(i);
             ft.add(i, i);
         }
+        System.out.println(ft.sum(-1));
         System.out.println(ft.sum(0));
         System.out.println(ft.sum(1));
-        System.out.println(ft.sum(3));
-        System.out.println(ft.sum(6));
+        System.out.println(ft.sum(2));
+        System.out.println(ft.sum(5));
         ft.add(3, -6);
-        System.out.println(ft.sum(6));
-        System.out.println(ft.range(4, 6));
-        System.out.println(ft.range(0, 9));
+        System.out.println(ft.sum(5));
+        System.out.println(ft.range(4, 5));
+        System.out.println(ft.range(0, 5));
 
         System.out.println("=======");
         var bit = new FenwickTree(5);
@@ -99,13 +100,13 @@ public class FenwickTreeMain {
          * @param v
          */
         void add(int x, T v) {
-            for (int i = x + 1; i <= arr.length; i += i & -i) {
+            for (int i = x + 1; i <= arr.length -1; i += i & -i) {
                 arr[i] = add.apply((T) arr[i], v);
             }
         }
 
         /**
-         * @param i 1 <= i <= N
+         * @param i 0 <= i < N
          */
         T sum(int i) {
             var s = e.get();

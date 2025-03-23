@@ -9,16 +9,21 @@ public class Combination {
         System.out.println(com.cal(8, 3));
     }
 
-    static class CombinationHelper{
+    static class CombinationHelper {
         final int MAX;
         final int MOD;
-        final long[] fac = new long[MAX];
-        final long[] finv = new long[MAX];
-        final long[] inv = new long[MAX];
+        final long[] fac;
+        final long[] finv;
+        final long[] inv;
 
-        public CombinationHelper(int max,int mod) {
+        public CombinationHelper(int max, int mod) {
             MOD = mod;
             MAX = max;
+
+            fac = new long[MAX];
+            finv = new long[MAX];
+            inv = new long[MAX];
+
             fac[0] = fac[1] = 1;
             finv[0] = finv[1] = 1;
             inv[1] = 1;
@@ -35,7 +40,7 @@ public class Combination {
                 return 0;
             if (n < 0 || k < 0)
                 return 0;
-            return  (fac[n] * (finv[k] * finv[n - k] % MOD) % MOD);
+            return (fac[n] * (finv[k] * finv[n - k] % MOD) % MOD);
         }
     }
 

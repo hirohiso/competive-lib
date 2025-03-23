@@ -17,7 +17,8 @@ public class Sequence {
         var comp = Comparator.<Integer>nullsLast(Comparator.comparingInt(i -> i));
         var sample = new Integer[]{3, 2, 4, 1, 3, 5, 2, 6, 100};
         var lis = new GenericsLIS<>(sample, comp);
-        lis.solve();
+        var result = lis.solve();
+        System.out.println(result);
     }
 
     public static class GenericsLIS<T> {
@@ -31,7 +32,7 @@ public class Sequence {
         }
 
         @SuppressWarnings("unchecked")
-        public void solve() {
+        public List<T> solve() {
             var N = array.length;//数値の個数
 
             var dp = new Object[N + 1];
@@ -61,6 +62,14 @@ public class Sequence {
                     table[i] = dpi[point - 1];
                 }
             }
+
+            var tail = dpi[lb((T[])dp, null) - 1];
+            var list = new LinkedList<T>();
+            while (tail != -1) {
+                list.addFirst(array[tail]);
+                tail = table[tail];
+            }
+            return list;
         }
 
         public final int lb(T[] arr, T value) {
