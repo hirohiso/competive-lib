@@ -25,6 +25,9 @@ public class Scc {
         sccSolver.solve();
         var scc = sccSolver.getResultScc();
         System.out.println(scc);
+
+        var dag = sccSolver.getDag();
+        System.out.println(dag);
     }
 
 
@@ -84,6 +87,27 @@ public class Scc {
                 scc.get(componetns[i] - 1).add(i);
             }
             return scc;
+        }
+
+        /**
+         * 強連結成分をDAGに変換する
+         * @return
+         */
+        public ArrayList<LinkedList<Integer>> getDag(){
+            var max = Arrays.stream(componetns).max().getAsInt();
+            var dag = new ArrayList<LinkedList<Integer>>(max);
+            for (int i = 0; i < max; i++) {
+                dag.add(new LinkedList<>());
+            }
+            for (int i = 0; i < componetns.length; i++) {
+                for (int j : edges[i]) {
+                    if (componetns[i] == componetns[j]) {
+                        continue;
+                    }
+                    dag.get(componetns[i] - 1).add(componetns[j] - 1);
+                }
+            }
+            return dag;
         }
 
         private void dfs(int now, boolean checked[]) {
