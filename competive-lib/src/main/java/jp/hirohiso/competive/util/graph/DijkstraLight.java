@@ -28,6 +28,7 @@ public class DijkstraLight {
         private long[] disitance;
         //隣接リスト
         private List<Edge>[] edgeList;
+        private int[] parent;
 
         //private edge[];
         public Dijkstra(int size) {
@@ -38,10 +39,17 @@ public class DijkstraLight {
                 this.disitance[i] = Long.MAX_VALUE;
                 this.edgeList[i] = new ArrayList<Edge>();
             }
+            this.parent = new int[size];
+            for (int i = 0; i < size; i++) {
+                this.parent[i] = -1;
+            }
         }
 
         public long[] getDistance() {
             return this.disitance;
+        }
+        public int[] getParent() {
+            return this.parent;
         }
 
         public void solve(int root) {
@@ -65,8 +73,8 @@ public class DijkstraLight {
                     if (this.disitance[node] > newCost) {
                         updateDistance(node, newCost);
                         pq.add(DistansNodeSet.of(newCost, node));
+                        parent[node] = n;
                     }
-
                 }
             }
         }
