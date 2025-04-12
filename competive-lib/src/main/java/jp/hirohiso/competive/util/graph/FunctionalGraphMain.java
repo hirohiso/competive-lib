@@ -17,6 +17,9 @@ public class FunctionalGraphMain {
         System.out.println(fg.allCycles()); // => [[2, 3, 4]]
     }
 
+    /**
+     * FunctionalGraph
+     */
     public static class FunctionalGraph {
         private final int[] to;
         private final int[][] jumpTable;
@@ -59,18 +62,30 @@ public class FunctionalGraphMain {
             }
         }
 
+        /**
+         * 指定されたノードから到達可能なループの長さと深さを取得する
+         */
         public int[] getCycleInfo(int v) {
             return new int[]{depth[v], loopLength[v]};
         }
 
+        /**
+         * 指定されたノードから到達可能なループの根を取得する
+         */
         public int getRoot(int v) {
             return loopStart[v];
         }
 
+        /**
+         * 指定されたノードからループまでの深さを取得する
+         */
         public int getDepth(int v) {
             return depth[v];
         }
 
+        /**
+         * サイクルを全て取得する
+         */
         public ArrayList<ArrayList<Integer>> allCycles() {
             boolean[] seen = new boolean[n];
             var res = new ArrayList<ArrayList<Integer>>();
@@ -90,6 +105,9 @@ public class FunctionalGraphMain {
             return res;
         }
 
+        /**
+         * 指定されたノードからk回ジャンプした先のノードを取得する
+         */
         public int jump(int v, long k) {
             for (int i = 0; i < MAX_LOG; i++) {
                 if (((k >> i) & 1) == 1) {
