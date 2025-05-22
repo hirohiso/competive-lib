@@ -35,6 +35,7 @@ public class PriorityRangeSumMain {
         }
     }
 
+    /*
     //区間内の昇順top Kのみをsumする
     private static class PriorityRangeSum {
 
@@ -107,6 +108,91 @@ public class PriorityRangeSumMain {
                 outK.poll();
             }
             return outK.peek();
+        }
+
+        public long sum() {
+            return this.sum;
+        }
+    }
+    */
+
+    //区間内の昇順top Kのみをsumする
+    private static class PriorityRangeSum {
+
+        private PriorityQueue<Long> inK;//K以内の要素集合
+        private PriorityQueue<Long> outK;//K超過の要素集合
+        private PriorityQueue<Long> del_inK;//inK内の遅延削除する要素集合;
+        private PriorityQueue<Long> del_outK;//outK内の遅延削除する要素集合;
+
+        private long sum = 0L;
+        private final int K;
+
+        public PriorityRangeSum(int K) {
+            this.inK = new PriorityQueue<>(Comparator.reverseOrder());
+            this.outK = new PriorityQueue<>();
+            this.del_inK = new PriorityQueue<>(Comparator.reverseOrder());
+            this.del_outK = new PriorityQueue<>();
+            this.K = K;
+        }
+
+
+        public void modify() {
+            //inKがKより少ない場合,outKから要素を移動する
+            while (inK.size() - del_inK.size() < K && !outK.isEmpty()) {
+                var p = outK.poll();
+                if (!del_outK.isEmpty() && Objects.equals(del_outK.peek(), p)) {
+                    del_outK.poll();
+                } else {
+                    inK.add(p);
+                    sum += p;
+                }
+            }
+            //intKがKより多い場合,inKから要素をoutに移動する
+            while (inK.size() - del_inK.size() > K) {
+                var p = inK.poll();
+                if (!del_inK.isEmpty() && Objects.equals(del_inK.peek(), p)) {
+                    del_inK.poll();
+                } else {
+                    outK.add(p);
+                    sum -= p;
+                }
+            }
+            //遅延削除を実行する
+            while (!del_inK.isEmpty() && Objects.equals(del_inK.peek(), inK.peek())) {
+                del_inK.poll();
+                inK.poll();
+            }
+        }
+
+        public void push(long x) {
+            inK.add(x);
+            sum += x;
+            modify();
+        }
+
+        public void pop(long x) {
+            if (!inK.isEmpty() && (long) inK.peek() == x) {
+                inK.poll();
+                sum -= x;
+            } else if (!inK.isEmpty() && x < (long)inK.peek()) {
+                sum -= x;
+                del_inK.add(x);
+            } else {
+                del_outK.add(x);
+            }
+            modify();
+        }
+
+        public long size() {
+            return this.sizeIn() + this.sizeOut();
+        }
+
+        private int sizeIn() {
+            return this.inK.size() - this.del_inK.size();
+        }
+
+        private int sizeOut() {
+            return this.outK.size() - this.del_outK.size();
         }
 
         public long sum() {

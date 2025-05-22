@@ -22,10 +22,15 @@ public class FenwickTreeMain {
 
         System.out.println("=======");
         var bit = new FenwickTree(5);
-        System.out.println(bit.sum(0));
-        System.out.println(bit.sum(3));
-        System.out.println(bit.sum(4));
-        System.out.println(bit.sum(4));
+        bit.add(0, 1);
+        bit.add(2, 1);
+        bit.add(4, 1);
+        bit.add(5, 1);
+
+        for (int i = 0; i < 5; i++) {
+            System.out.println(bit.sum(i));
+            System.out.println(bit.range(i, i + 1));
+        }
     }
 
     private static class FenwickTree {
@@ -63,8 +68,13 @@ public class FenwickTreeMain {
             return s;
         }
 
+        /**
+         * @param start 0 <= start < N
+         * @param end   0 < end <= N
+         * @return
+         */
         long range(int start, int end) {
-            return sum(end) - sum(start - 1);
+            return sum(end - 1) - sum(start - 1);
         }
     }
 
@@ -100,7 +110,7 @@ public class FenwickTreeMain {
          * @param v
          */
         void add(int x, T v) {
-            for (int i = x + 1; i <= arr.length -1; i += i & -i) {
+            for (int i = x + 1; i <= arr.length - 1; i += i & -i) {
                 arr[i] = add.apply((T) arr[i], v);
             }
         }
@@ -118,8 +128,13 @@ public class FenwickTreeMain {
             return s;
         }
 
+        /**
+         * @param start 0 <= start < N
+         * @param end   0 < end <= N
+         * @return
+         */
         T range(int start, int end) {
-            var r = sum(end);
+            var r = sum(end - 1);
             var l = sum(start - 1);
             return add.apply(r, inv.apply(l));
         }

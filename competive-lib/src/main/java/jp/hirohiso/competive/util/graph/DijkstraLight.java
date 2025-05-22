@@ -126,4 +126,6 @@ public class DijkstraLight {
 
     }
 
+    //ダイクストラ　半環
+    // min max -> パス上のコストのmaxのmin
 }

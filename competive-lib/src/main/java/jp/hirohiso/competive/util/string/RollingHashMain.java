@@ -40,15 +40,15 @@ public class RollingHashMain {
      * @param v
      */
     record ShiftHash(long v, int size) {
-        static long b = 3491;//基数
+        static long b = 37;//基数
         static long m = 999_999_937;
         //64bit mod
         //static long m = (1L << 61) - 1;
 
-        static LongBinaryOperator mul = (a, b) -> (a * b) % m;
+        //static LongBinaryOperator mul = (a, b) -> (a * b) % m;
 
         //オーバフロー対策付き
-        //static LongBinaryOperator mul = (a, b) -> mul(a, b, m);
+        static LongBinaryOperator mul = (a, b) -> mul(a, b, m);
 
         static ShiftHash of(char c) {
             return new ShiftHash((c) % m, 1);

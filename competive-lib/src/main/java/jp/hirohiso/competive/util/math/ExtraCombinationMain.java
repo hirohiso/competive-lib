@@ -2,10 +2,11 @@ package jp.hirohiso.competive.util.math;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class ExtraCombinationMain {
     public static void main(String[] args) {
-        var nk = new ElementsByKGroup(10, 4, true,
+        var nk = new ElementsByKGroup(1, 4, true,
                 arr -> System.out.println(Arrays.toString(arr))
         );
         nk.solve();
