@@ -23,6 +23,49 @@ public class MatrixLib {
     }
 
 
+    public static long[][] matrixPow(long[][] matrix, long n, long mod) {
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            throw new IllegalArgumentException("行列は空であってはならない");
+        }
+        int size = matrix.length;
+        long[][] result = new long[size][size];
+        for (int i = 0; i < size; i++) {
+            result[i][i] = 1; // 単位行列
+        }
+
+        while (n > 0) {
+            if ((n & 1) == 1) {
+                result = multiplyMatrices(result, matrix, mod);
+            }
+            matrix = multiplyMatrices(matrix, matrix, mod);
+            n >>= 1;
+        }
+        return result;
+    }
+
+    private static long[][] multiplyMatrices(long[][] a, long[][] b, long mod) {
+        int rowsA = a.length;
+        int colsA = a[0].length;
+        int colsB = b[0].length;
+
+        if (colsA != b.length) {
+            throw new IllegalArgumentException("行列の要素数が一致しない");
+        }
+        long[][] result = new long[rowsA][colsB];
+        for (int i = 0; i < result.length; i++) {
+            for (int j = 0; j < result.length; j++) {
+                result[i][j] = 0;
+                for (int k = 0; k < colsA; k++) {
+                    var temp = (a[i][k] * b[k][j]) % mod;
+                    result[i][j] += temp;
+                    result[i][j] %= mod;
+                }
+            }
+        }
+        return result;
+    }
+
+
     public static class Matrix {
         private final long[][] values;
 
@@ -30,7 +73,7 @@ public class MatrixLib {
             this.values = values;
         }
 
-        public Matrix apply(LongUnaryOperator func){
+        public Matrix apply(LongUnaryOperator func) {
             Builder builder = new Builder(this.values.length, this.values[0].length);
             for (int i = 0; i < this.values.length; i++) {
                 for (int j = 0; j < this.values[i].length; j++) {

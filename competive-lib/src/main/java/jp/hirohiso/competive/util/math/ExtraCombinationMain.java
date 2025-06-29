@@ -12,22 +12,37 @@ public class ExtraCombinationMain {
         nk.solve();
 
 
-
-        var bell = new DistinctElementsByKGroup(5, 5, true,
+        var bell = new DistinctElementsByKGroup(8, 8, true,
                 list -> {
                     list.stream().forEach(i ->
                             System.out.print(Integer.toBinaryString(i) + " "));
                     System.out.println();
+                    var sets = new LinkedList<LinkedList<Integer>>();
+                    for (var i : list) {
+                        var set = new LinkedList<Integer>();
+                        for (int j = 0; j < 8; j++) {
+                            if ((i & (1 << j)) != 0) {
+                                set.add(j);
+                            }
+                        }
+                        sets.add(set);
+                    }
                 });
         bell.solve();
 
         {
             var ans = new int[]{0};
-            var temp = new ElementsByKGroup(50, 50, true,
-                    arr -> ans[0]++
-            );
-            temp.solve();
-            System.out.println(ans[0]);
+            for (int i = 20; i <= 40; i++) {
+                var temp = new ElementsByKGroup(i, 4, true,
+                        arr -> {
+                            System.err.println(Arrays.toString(arr));
+                            ans[0]++;
+                        }
+
+                );
+                temp.solve();
+            }
+            System.out.println(ans[0] * 4 * 3 * 2 * 1);
         }
     }
 
