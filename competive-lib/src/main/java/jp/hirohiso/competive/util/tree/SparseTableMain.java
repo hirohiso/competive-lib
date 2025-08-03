@@ -14,7 +14,7 @@ public class SparseTableMain {
 
         var st = new SparseTable<>(arr, ope);
 
-        System.out.println(st.query(0, 8));
+        System.out.println(st.query(0, 1));
 
         System.out.println(st.query(3, 6));
 

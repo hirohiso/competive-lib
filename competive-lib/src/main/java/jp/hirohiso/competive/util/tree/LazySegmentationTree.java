@@ -75,6 +75,83 @@ public class LazySegmentationTree {
         System.out.println("区間[0,4):" + sum.getRange(0, 4).v);
         System.out.println("区間[2,6):" + sum.getRange(2, 6).v);
         System.out.println("区間[6,8):" + sum.getRange(6, 8).v);
+
+
+        {
+            //Range Affine Range Sum
+            record Node(int v, int size) {
+                static public Node e() {
+                    return new Node(0, 0);
+                }
+
+                public Node add(Node other) {
+                    return new Node(this.v + other.v, this.size + other.size);
+                }
+            }
+            ;
+
+            record Act(int a, int b) {
+                static public Act e() {
+                    return new Act(1, 0);
+                }
+
+                public Node apply(Node node) {
+                    return new Node(node.v * a + b * node.size, node.size);
+                }
+
+                public Act compose(Act other) {
+                    return new Act(this.a * other.a, this.b * other.a + this.b);
+                }
+            }
+
+            var arr = new Integer[]{1, 1, 2, 3, 5, 8, 13};
+            var lst = new LazySegmentTree<Node, Act>(
+                    Arrays.stream(arr).map(n -> new Node(n, 1)).toArray(Node[]::new),
+                    Node::add,
+                    Act::apply,
+                    Act::compose,
+                    Node::e,
+                    Act::e
+            );
+        }
+
+        {
+            //range update range sum
+            record Node(int v, int size) {
+                static public Node e() {
+                    return new Node(0, 0);
+                }
+
+                public Node add(Node other) {
+                    return new Node(this.v + other.v, this.size + other.size);
+                }
+            }
+            ;
+
+            record Act(int update) {
+                static public Act e() {
+                    return new Act(0);
+                }
+
+                public Node apply(Node node) {
+                    return new Node(update * node.size, node.size);
+                }
+
+                public Act compose(Act other) {
+                    return new Act(this.update);
+                }
+            }
+
+            var arr = new Integer[]{1, 1, 2, 3, 5, 8, 13};
+            var lst = new LazySegmentTree<Node, Act>(
+                    Arrays.stream(arr).map(n -> new Node(n, 1)).toArray(Node[]::new),
+                    Node::add,
+                    Act::apply,
+                    Act::compose,
+                    Node::e,
+                    Act::e
+            );
+        }
     }
 
     record Pair(int v, int n) {

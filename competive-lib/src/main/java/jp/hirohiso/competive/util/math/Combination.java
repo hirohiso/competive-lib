@@ -3,10 +3,11 @@ package jp.hirohiso.competive.util.math;
 public class Combination {
 
     public static void main(String[] args) {
-        var com = new CombinationHelper(1000000, 1000000007);
+        var com = new CombinationHelper(1000000, 998244353);
 
 
         System.out.println(com.cal(8, 3));
+        System.out.println(com.cal(0, 3));
     }
 
     static class CombinationHelper {
