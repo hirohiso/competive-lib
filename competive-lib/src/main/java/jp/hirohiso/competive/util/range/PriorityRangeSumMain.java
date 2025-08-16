@@ -9,7 +9,7 @@ public class PriorityRangeSumMain {
 
         var prs2 = new PriorityRangeSumT<Long>(3,
                 Comparator.naturalOrder(),//並び順
-                (x, y) -> x + y, //加算
+                Long::sum, //加算
                 (x, y) -> x - y,//減算
                 0l//単位元
         );

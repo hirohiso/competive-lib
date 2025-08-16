@@ -130,7 +130,7 @@ public class LazySegmentationTree {
 
             record Act(int update) {
                 static public Act e() {
-                    return new Act(0);
+                    return new Act(0);//modの場合は-1にして、applyとcomposeは-1の時の処理を作成する
                 }
 
                 public Node apply(Node node) {
@@ -138,7 +138,7 @@ public class LazySegmentationTree {
                 }
 
                 public Act compose(Act other) {
-                    return new Act(this.update);
+                    return new Act(other.update);
                 }
             }
 
@@ -220,20 +220,19 @@ public class LazySegmentationTree {
 
         private void apply(int start, int end, int k, int l, int r, U f) {
             //k番目の要素を評価
-            eval(k, l, r);
             if (r <= start || end <= l) {
                 return;
             }
-            //被覆しているならlazyに格納したあと評価
+            //被覆しているならlazyのみ更新
             if (start <= l && r <= end) {
                 mergeLazy(k, f);
-                eval(k, l, r);
             } else {
+                eval(k, l, r);
                 //異なるなら子の要素を計算して,値を更新
                 apply(start, end, k * 2 + 1, l, (l + r) / 2, f);
                 apply(start, end, k * 2 + 2, (l + r) / 2, r, f);
-                T a = getType(2 * k + 1);
-                T b = getType(2 * k + 2);
+                T a = getLazyAppliedType(2 * k + 1);
+                T b = getLazyAppliedType(2 * k + 2);
                 setType(k, this.operator.apply(a, b));
             }
         }
@@ -246,10 +245,10 @@ public class LazySegmentationTree {
             if (r <= start || end <= l) {
                 return e.get();
             }
-            eval(k, l, r);
             if (start <= l && r <= end) {
-                return getType(k);
+                return getLazyAppliedType(k);
             }
+            eval(k, l, r);
             T a = getRange(start, end, k * 2 + 1, l, (l + r) / 2);
             T b = getRange(start, end, k * 2 + 2, (l + r) / 2, r);
             return this.operator.apply(a, b);
@@ -257,25 +256,31 @@ public class LazySegmentationTree {
 
         //遅延評価
         private void eval(int k, int l, int r) {
-            if (getLazy(k) != id.get()) {
+            if (!getLazy(k).equals(id.get())) {
                 T a = getType(k);
                 U b = getLazy(k);
                 setType(k, this.mapping.apply(b, a));
+                setLazy(k, id.get());
                 if (r - l > 1) {
                     mergeLazy(2 * k + 1, b);
                     mergeLazy(2 * k + 2, b);
                 }
-                setLazy(k, id.get());
             }
         }
 
         private void mergeLazy(int k, U f) {
-            setLazy(k, this.composition.apply(f, getLazy(k)));
+            setLazy(k, this.composition.apply(getLazy(k), f));
         }
 
         @SuppressWarnings("unchecked")
         private T getType(int index) {
             return (T) Objects.requireNonNullElse(this.array[index], e.get());
+        }
+
+        @SuppressWarnings("unchecked")
+        private  T getLazyAppliedType(int index) {
+            var v = (T) Objects.requireNonNullElse(this.array[index], e.get());
+            return this.mapping.apply(getLazy(index), v);
         }
 
         private void setType(int index, T e) {
@@ -292,11 +297,15 @@ public class LazySegmentationTree {
         }
 
         public void debug() {
+            System.err.println("value:");
             for (Object i : this.array) {
-                System.out.println(i);
+                System.err.println(i);
+            }
+            System.err.println("Lazy:");
+            for (Object i : this.lazy) {
+                System.err.println(i);
             }
         }
 
     }
-
 }
