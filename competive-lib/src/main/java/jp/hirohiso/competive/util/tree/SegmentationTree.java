@@ -15,7 +15,7 @@ public class SegmentationTree {
             }
             return i + j;
         };
-        SegmentTree<Integer> st = new SegmentTree<>(new Integer[] { 1, 1, 2, 3, 5, 8, 13 }, func);
+        SegmentTree<Integer> st = new SegmentTree<>(new Integer[]{1, 1, 2, 3, 5, 8, 13}, func);
         st.debug();
 
         System.out.println("区間[0,0):" + st.getRange(0, 1));
@@ -65,6 +65,10 @@ public class SegmentationTree {
                 setType(i, this.operator.apply(a, b));
             }
 
+        }
+
+        public T get(int index) {
+            return getType(index + rowSize - 1);
         }
 
         public void update(int x, T val) {
