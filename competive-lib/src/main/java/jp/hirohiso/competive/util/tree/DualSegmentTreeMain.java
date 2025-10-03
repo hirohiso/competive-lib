@@ -30,6 +30,7 @@ public class DualSegmentTreeMain {
     //双対セグメンテーション木
     //T : Data
     //U : Lazy
+    //todo: N == 1 の時うまく更新されない
     public static class DualSegmentTree<T, U> {
         //配列
         private Object[] array, lazy;

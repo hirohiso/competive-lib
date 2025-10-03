@@ -17,6 +17,7 @@ public class SparseTableMain {
         System.out.println(st.query(0, 1));
 
         System.out.println(st.query(3, 6));
+        System.out.println(st.query(0, 8));
 
     }
 

@@ -15,8 +15,9 @@ public class ManhattanMstMain {
     record ManhattanPoint(int x, int y) {
     }
 
+    //https://github.com/hitonanode/cplib-cpp/blob/master/graph/manhattan_mst.hpp
     static class ManhattanMst {
-        //マンハッタン最小全域木の候補となる点を全て求める
+        //マンハッタン最小全域木の候補となる辺を全て求める
         public static List<ManhattanEdge> solve(ManhattanPoint[] points) {
             var n = points.length;
             var edges = new ArrayList<ManhattanEdge>();
@@ -47,7 +48,6 @@ public class ManhattanMstMain {
                             }
                             var w = Math.abs(xs[i] - xs[j]) + Math.abs(ys[i] - ys[j]);
                             edges.add(new ManhattanEdge(i, j, w));
-                            // eraseして次に進む
                             sweep.remove(it.getKey());
                             it = sweep.ceilingEntry(-ys[i]);
                         }

@@ -125,7 +125,7 @@ public class PriorityRangeSumMain {
         private PriorityQueue<Long> del_outK;//outK内の遅延削除する要素集合;
 
         private long sum = 0L;
-        private final int K;
+        private int K;
 
         public PriorityRangeSum(int K) {
             this.inK = new PriorityQueue<>(Comparator.reverseOrder());
@@ -133,6 +133,11 @@ public class PriorityRangeSumMain {
             this.del_inK = new PriorityQueue<>(Comparator.reverseOrder());
             this.del_outK = new PriorityQueue<>();
             this.K = K;
+        }
+
+        public void updateK(int K) {
+            this.K = K;
+            modify();
         }
 
 

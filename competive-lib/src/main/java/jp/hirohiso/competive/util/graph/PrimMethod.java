@@ -20,36 +20,36 @@ public class PrimMethod {
 
     private static class Prim {
         private final int size;
-        Map<Integer, List<Edge>> edgeListMap;
-        private List<Edge> treeEdge = new ArrayList<>();
-        private final Comparator<Edge> comp = Comparator.comparingInt(e -> e.cost);
+        ArrayList<LinkedList<Edge>> adjList;
+        private final List<Edge> treeEdge = new ArrayList<>();
+        private final Comparator<Edge> comp = Comparator.comparingLong(e -> e.cost);
 
         public Prim(int i) {
             this.size = i;
-            this.edgeListMap = new TreeMap<>();
+            this.adjList = new ArrayList<>();
             for (int j = 0; j < this.size; j++) {
-                this.edgeListMap.put(j, new ArrayList<>());
+                this.adjList.add(new LinkedList<>());
             }
         }
 
         //i,i1は0 から size-1まで
-        public void addEdge(int i, int i1, int i2) {
-            Edge e = new Edge(i, i1, i2);
-            this.edgeListMap.get(i).add(e);
-            this.edgeListMap.get(i1).add(e);
+        public void addEdge(int i, int i1, long i2) {
+            var e = new Edge(i, i1, i2);
+            this.adjList.get(i).add(e);
+            this.adjList.get(i1).add(e);
         }
 
         public void solve() {
             //探索済ノード
-            boolean[] visited = new boolean[size];
+            this.treeEdge.clear();
+            var visited = new boolean[size];
             Arrays.fill(visited, false);
-
             PriorityQueue<Edge> pq = new PriorityQueue<>(comp);
 
             //頂点0を探索済にする
             visited[0] = true;
             //頂点0から出ている辺を全て加える
-            List<Edge> list = this.edgeListMap.get(0);
+            var list = this.adjList.get(0);
             pq.addAll(list);
 
             Edge e;
@@ -61,16 +61,16 @@ public class PrimMethod {
                 //未探索の点を得る
                 //両方未探索ケースはない
                 this.treeEdge.add(e);
-                int n = visited[e.node1] ? e.node2 : e.node1;
+                var n = visited[e.node1] ? e.node2 : e.node1;
                 //頂点nから出ている辺を全て加える
-                List<Edge> list2 = this.edgeListMap.get(n);
+                var list2 = this.adjList.get(n);
                 pq.addAll(list2);
                 visited[n] = true;
             }
         }
 
-        public int answer(){
-            int result = 0;
+        public long answer(){
+            var  result = 0L;
             for(Edge e:this.treeEdge){
                 result += e.cost;
             }
@@ -80,9 +80,9 @@ public class PrimMethod {
         private static class Edge {
             private final int node1;
             private final int node2;
-            private final int cost;
+            private final long cost;
 
-            Edge(int n1, int n2, int cost) {
+            Edge(int n1, int n2, long cost) {
                 this.node1 = n1;
                 this.node2 = n2;
                 this.cost = cost;
