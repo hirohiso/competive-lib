@@ -9,6 +9,24 @@ public class Gcd {
 
     public static class MathUtil {
 
+        public static long chineseRemainderTheorem(long[] x, long[] m) {
+            if (x.length != m.length) {
+                throw new IllegalArgumentException();
+            }
+            int n = x.length;
+            long M = 1;
+            long X = 0;
+            for (int i = 0; i < n; i++) {
+                ExtGcdPara para = getExtGcdPara();
+                extgcd(M, m[i], para);
+                var x2 = para.x * (x[i] - X);
+                X += (M * x2);
+                M *= m[i];
+                X = (X % M + M) % M;
+            }
+            return X;
+        }
+
         public static class ExtGcdPara {
             int x;
             int y;

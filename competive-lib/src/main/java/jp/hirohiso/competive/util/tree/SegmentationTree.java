@@ -67,6 +67,18 @@ public class SegmentationTree {
 
         }
 
+        public static <S> BinaryOperator<S> wrapNullAsE(BinaryOperator<S> ope) {
+            return (m1, m2) -> {
+                if (m1 == null) {
+                    return m2;
+                }
+                if (m2 == null) {
+                    return m1;
+                }
+                return ope.apply(m1, m2);
+            };
+        }
+
         public T get(int index) {
             return getType(index + rowSize - 1);
         }
