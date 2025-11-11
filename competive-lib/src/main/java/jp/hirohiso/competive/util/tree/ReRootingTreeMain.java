@@ -165,7 +165,7 @@ public class ReRootingTreeMain {
 
                     //親方向のEを更新
                     var parentVal = computeVertexFunction.putVertex(now, withoutChildE);
-                    var parentE = computeEdgeFunction.putEdge(parentVal, e.idx);
+                    var parentE = computeEdgeFunction.putEdge(parentVal, e.xdi());
                     dp[e.xdi()] = parentE;
 
                     //子ノードに再帰
