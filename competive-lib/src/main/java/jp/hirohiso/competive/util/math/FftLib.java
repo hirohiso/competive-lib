@@ -1,7 +1,5 @@
 package jp.hirohiso.competive.util.math;
 
-import java.util.Arrays;
-
 public class FftLib {
 
     public static void main(String[] args) {
@@ -67,8 +65,8 @@ public class FftLib {
                     resize1.complexes[i] = this.complexes[i];
                     resize2.complexes[i] = target.complexes[i];
                 } else {
-                    resize1.complexes[i] = new Complex(0, 0);
-                    resize2.complexes[i] = new Complex(0, 0);
+                    resize1.complexes[i] = Complex.ie1();
+                    resize2.complexes[i] = Complex.ie1();
                 }
             }
             ComplexArray result = new ComplexArray(resize1.size());
@@ -111,16 +109,16 @@ public class FftLib {
             }
 
             for (int len = 2; len <= n; len <<= 1) {
-                //要素数N = len *2　のfft計算
-                double theta = 2.0 * Math.PI / len * (invertFlg ? -1 : 1);
-                var wlen = Complex.fromRadian(theta);
+                //1 の len 乗根の取得
+                var wlen = invertFlg ? Complex.invRoot(len) : Complex.root(len);
 
                 for (int i = 0; i < n; i += len) {
-                    Complex wn = new Complex(1, 0);
+                    //単位元
+                    var wn = Complex.ie2();
 
                     for (int j = 0; j < len / 2; j++) {
-                        Complex u = result.complexes[i + j];
-                        Complex v = result.complexes[i + j + len / 2].multiply(wn);
+                        var u = result.complexes[i + j];
+                        var v = result.complexes[i + j + len / 2].multiply(wn);
 
                         result.complexes[i + j] = u.add(v);
                         result.complexes[i + j + len / 2] = u.sub(v);
@@ -171,8 +169,34 @@ public class FftLib {
             return Math.sqrt(re * re + im * im);
         }
 
+        //加法の単位元の取得
+        public static Complex ie1() {
+            return new Complex(0, 0);
+        }
+
+        //乗法の単位元の取得
+        public static Complex ie2() {
+            return new Complex(1, 0);
+        }
+
         public static Complex fromRadian(double radian) {
             return new Complex(Math.cos(radian), Math.sin(radian));
+        }
+
+        //1 の length根を取得
+        public static Complex root(int length) {
+            //要素数N = len *2　のfft計算
+            double theta = 2.0 * Math.PI / length;
+            //1 / len 乗根の取得
+            return Complex.fromRadian(theta);
+        }
+
+        //1 の length根の逆元を取得
+        public static Complex invRoot(int length) {
+            //要素数N = len *2　のfft計算
+            double theta = 2.0 * Math.PI / length * -1;
+            //1 / len 乗根の取得
+            return Complex.fromRadian(theta);
         }
 
         public Complex divide(double d) {
