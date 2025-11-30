@@ -27,15 +27,15 @@ public class Dinic {
         //隣接リスト
         private List<Edge>[] edgeList;
         //sからの距離
-        private long level[];
+        private int level[];
 
         //どこまで調べ終わったか
-        private long iter[];
+        private int iter[];
 
         public DinicFlow(int size) {
             this.edgeList = new ArrayList[size];
-            this.level = new long[size];
-            this.iter = new long[size];
+            this.level = new int[size];
+            this.iter = new int[size];
 
             for (int i = 0; i < size; i++) {
                 this.edgeList[i] = new ArrayList<Edge>();
@@ -55,8 +55,9 @@ public class Dinic {
 
         public long solve(int source, int tink) {
             long flow = 0;
+            int[] que = new int[this.level.length];
             while (true) {
-                bfs(source);
+                bfs(source, tink, que);
                 if (this.level[tink] < 0) {
                     return flow;
                 }
@@ -76,36 +77,43 @@ public class Dinic {
         }
 
         private long dfs(int source, int tink, long maxValue) {
-            if(source == tink) {
+            if (source == tink) {
                 return maxValue;
             }
-            for(Edge e : this.edgeList[source]){
-                if(e.cost >0 && this.level[source] < this.level[e.target]){
-                    long d = dfs(e.target,tink,Math.min(maxValue, e.cost));
-                    if(d > 0){
+            long res = 0;
+            int sourceLevel = this.level[source];
+            // iterを使用して、前回探索した位置から再開
+            for (int itMax = this.edgeList[source].size(); this.iter[source] < itMax; this.iter[source]++) {
+                Edge e = this.edgeList[source].get(this.iter[source]);
+                if (e.cost > 0 && sourceLevel < this.level[e.target]) {
+                    long d = dfs(e.target, tink, Math.min(maxValue - res, e.cost));
+                    if (d > 0) {
                         e.cost -= d;
-                        e.revers.cost +=d;
-                        return d;
+                        e.revers.cost += d;
+                        res += d;
+                        if (res == maxValue) break;
                     }
                 }
             }
-            return 0;
+            return res;
         }
 
-        private void bfs(int source) {
-           resetLevel();
-           Queue<Integer> queue = new LinkedList<>();
-           this.level[source] = 0;
-           queue.add(source);
-           while(!queue.isEmpty()){
-               int v = queue.poll();
-               for(Edge e : this.edgeList[v]){
-                   if(e.cost > 0 && level[e.target] < 0 ){
-                       level[e.target] = level[v] + 1;
-                       queue.add(e.target);
-                   }
-               }
-           }
+        private void bfs(int source, int tink, int[] que) {
+            resetLevel();
+            int hd = 0, tl = 0;
+            que[tl++] = source;
+            this.level[source] = 0;
+            while (hd < tl) {
+                int v = que[hd++];
+                for (Edge e : this.edgeList[v]) {
+                    int target = e.target;
+                    if (e.cost > 0 && level[target] < 0) {
+                        level[target] = level[v] + 1;
+                        if (target == tink) return;  // 早期終了
+                        que[tl++] = target;
+                    }
+                }
+            }
 
         }
 
@@ -135,4 +143,5 @@ public class Dinic {
         }
 
     }
+
 }
