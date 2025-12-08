@@ -52,6 +52,52 @@ class RangeSet {
         set.add(new Range(Long.MIN_VALUE, Long.MIN_VALUE));
         set.add(new Range(Long.MAX_VALUE, Long.MAX_VALUE));
     }
+    public RangeSet and(RangeSet other) {
+        var ret = new RangeSet();
+        // 番兵を無視するために、次の要素からイテレータを開始する
+        var itA = this.set.iterator();
+        var itB = other.set.iterator();
+
+        // 番兵をスキップ
+        if (itA.hasNext()) itA.next();
+        if (itB.hasNext()) itB.next();
+
+        if (!itA.hasNext() || !itB.hasNext()) {
+            return ret; // どちらかが空なら共通区間なし
+        }
+
+        var currentA = itA.next();
+        var currentB = itB.next();
+
+        // どちらかのイテレータが終端に達するまで繰り返す
+        while (true) {
+            // 1. 共通区間の開始点を計算
+            long start = Math.max(currentA.l(), currentB.l());
+
+            // 2. 共通区間の終了点を計算
+            long end = Math.min(currentA.r(), currentB.r());
+
+            // 3. 共通区間が存在するかチェック
+            // 区間が [l, r) または [l, r] のどちらを意味するかで条件は変わるが、
+            // 提示されたコードは終了点が小さい方を採用しているため、
+            // end > start または end >= start を使う (ここでは end > start を仮定)
+            if (start < end) {
+                ret.insert(new Range(start, end));
+            }
+
+            // 4. 次に進める区間を決定
+            // 終了点が小さい方の区間を次に進める
+            if (currentA.r() <= currentB.r()) {
+                if (!itA.hasNext()) break;
+                currentA = itA.next();
+            } else {
+                if (!itB.hasNext()) break;
+                currentB = itB.next();
+            }
+        }
+
+        return ret;
+    }
 
     //xを含むRangeを返却する
     //存在しない場合はnull
@@ -65,21 +111,22 @@ class RangeSet {
         }
     }
 
-    public Range getLeft(long x){
+    public Range getLeft(long x) {
         var r = new Range(x, x);
-        var pre = set.headSet(r,true).descendingSet();
-        for(var range : pre){
-            if(range.r() <= x){
+        var pre = set.headSet(r, true).descendingSet();
+        for (var range : pre) {
+            if (range.r() <= x) {
                 return range;
             }
         }
         return null;
     }
-    public Range getRight(long x){
+
+    public Range getRight(long x) {
         var r = new Range(x, x);
-        var pre = set.tailSet(r,false);
-        for(var range : pre){
-            if(range.l() > x){
+        var pre = set.tailSet(r, false);
+        for (var range : pre) {
+            if (range.l() > x) {
                 return range;
             }
         }
@@ -131,7 +178,7 @@ class RangeSet {
                 } else if (range.r() < ran.r()) {
                     set.add(new Range(range.r(), ran.r()));
                     ret.add(new Range(ran.l(), range.r()));
-                }else{
+                } else {
                     ret.add(new Range(ran.l(), ran.r()));
                 }
             }
@@ -141,8 +188,7 @@ class RangeSet {
 
     @Override
     public String toString() {
-        return "RangeSet{" +
-                "set=" + set +
-                '}';
+        return "RangeSet{" + "set=" + set + '}';
     }
 }
+
