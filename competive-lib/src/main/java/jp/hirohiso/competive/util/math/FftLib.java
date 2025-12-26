@@ -1,93 +1,89 @@
 package jp.hirohiso.competive.util.math;
 
+import java.util.Arrays;
+import java.util.function.BiFunction;
+
 public class FftLib {
 
     public static void main(String[] args) {
-
-        //todo:ライブラリを呼び出す前に畳み込み後の配列の長さに合わせて0埋めが必要。
-        double[] input = new double[]{1, 2, 3, 4, 0, 0, 0, 0};
-        double[] input2 = new double[]{1, 2, 3, 4, 0, 0, 0, 0};
-        double[] sample = new double[]{1, 4, 10, 20, 25, 24, 16, 0};
-        ComplexArray ca = new ComplexArray(input);
-        ca.print();
-        ca.fft().print();
-
-        ComplexArray ca2 = new ComplexArray(input2);
-        ca2.print();
-        ca2.fft().print();
-        ca2.fft().ifft().print();
-
-        var ca3 = new ComplexArray(sample);
-        ca3.fft().print();
-        ca.fft().compose(ca2.fft()).ifft().print();
+        var fft = new FastFourierTransform(Complex.ie1(), Complex.ie2());
+        var str = Arrays.toString(fft.convolution(new long[]{1, 2, 3, 4}, new long[]{1, 2, 4, 8}));
+        System.out.println(str);
     }
 
-    public static class ComplexArray {
+    static class FastFourierTransform {
+        private Complex ie1;
+        private Complex ie2;
 
-        Complex[] complexes;
-
-        public ComplexArray(int size) {
-            complexes = new Complex[size];
+        public FastFourierTransform(Complex ie1, Complex ie2) {
+            this.ie1 = ie1;
+            this.ie2 = ie2;
         }
 
-        public ComplexArray(double[] r) {
-            complexes = new Complex[r.length];
-            for (int i = 0; i < r.length; i++) {
-                complexes[i] = new Complex(r[i], 0);
-            }
-        }
+        public Complex[] compose(Complex[] com1, Complex[] com2) {
 
-        public ComplexArray(ComplexArray orig) {
-            complexes = new Complex[orig.complexes.length];
-            for (int j = 0; j < complexes.length; j++) {
-                complexes[j] = orig.complexes[j];
-            }
-        }
-
-        public int size() {
-            return this.complexes.length;
-        }
-
-        public ComplexArray compose(ComplexArray target) {
-            if (this.complexes.length != target.complexes.length) {
-                throw new IllegalArgumentException();
-            }
-            var newSize = target.size();
-            /*
-             while (this.complexes.length + target.complexes.length + 1 > newSize) {
-             newSize <<= 1;
-             }
-             */
-            var resize1 = new ComplexArray(newSize);
-            var resize2 = new ComplexArray(newSize);
-            for (int i = 0; i < newSize; i++) {
-                if (i < this.complexes.length) {
-                    resize1.complexes[i] = this.complexes[i];
-                    resize2.complexes[i] = target.complexes[i];
-                } else {
-                    resize1.complexes[i] = Complex.ie1();
-                    resize2.complexes[i] = Complex.ie1();
-                }
-            }
-            ComplexArray result = new ComplexArray(resize1.size());
-            for (int i = 0; i < newSize; i++) {
-                result.complexes[i] = resize1.complexes[i].multiply(resize2.complexes[i]);
+            Complex[] result = new Complex[com1.length];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = com1[i].multiply(com2[i]);
             }
             return result;
         }
 
-        public ComplexArray fft() {
-            return fftInner(false);
+        public long[] convolution(long[] a, long[] b) {
+            var newSize = 1;
+            while (a.length + b.length - 1 > newSize) {
+                newSize <<= 1;
+            }
+            //aをlongから2冪の配列の環へ
+            var ca = toFourierArray(a, newSize);
+            //aをに変換
+            var fa = fft(ca);
+            //bをlongから環へ
+            var cb = toFourierArray(b, newSize);
+            //bを２冪の配列に変換
+            var fb = fft(cb);
+            //aとbを畳み込み
+            var c = compose(fa, fb);
+
+            //cを逆フーリエ変換して返却
+            var cc = ifft(c);
+            return toLongArray(cc);
         }
 
-        public ComplexArray ifft() {
-            return fftInner(true);
+        private long[] toLongArray(Complex[] target) {
+            var size = target.length;
+            var result = new long[size];
+            Arrays.setAll(result, i -> target[i].toLong());
+            return result;
         }
 
-        public ComplexArray fftInner(boolean invertFlg) {
-            int n = this.size();
+        private Complex[] toFourierArray(long[] target, int targetSize) {
+            var result = new Complex[targetSize];
+            for (int i = 0; i < result.length; i++) {
+                if (i < target.length) {
+                    result[i] = Complex.from(target[i]);
+                } else {
+                    result[i] = ie1;
+                }
+            }
+            return result;
+        }
 
-            ComplexArray result = new ComplexArray(this);
+        public Complex[] fft(Complex[] target) {
+            return fftInner(target, false);
+        }
+
+        public Complex[] ifft(Complex[] target) {
+            return fftInner(target, true);
+        }
+
+        public Complex[] fftInner(Complex[] target, boolean invertFlg) {
+            int n = target.length;
+
+            var result = new Complex[target.length];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = target[i];
+            }
             if (n == 1) {
                 return result;
             }
@@ -102,9 +98,9 @@ public class FftLib {
                 }
                 j ^= bit;
                 if (i < j) {
-                    var temp = result.complexes[i];
-                    result.complexes[i] = result.complexes[j];
-                    result.complexes[j] = temp;
+                    var temp = result[i];
+                    result[i] = result[j];
+                    result[j] = temp;
                 }
             }
 
@@ -114,43 +110,43 @@ public class FftLib {
 
                 for (int i = 0; i < n; i += len) {
                     //単位元
-                    var wn = Complex.ie2();
+                    var wn = ie2;
 
                     for (int j = 0; j < len / 2; j++) {
-                        var u = result.complexes[i + j];
-                        var v = result.complexes[i + j + len / 2].multiply(wn);
+                        var u = result[i + j];
+                        var v = result[i + j + len / 2].multiply(wn);
 
-                        result.complexes[i + j] = u.add(v);
-                        result.complexes[i + j + len / 2] = u.sub(v);
+                        result[i + j] = u.add(v);
+                        result[i + j + len / 2] = u.sub(v);
 
                         wn = wn.multiply(wlen);
                     }
                 }
             }
             if (invertFlg) {
-                for (int i = 0; i < result.complexes.length; i++) {
-                    result.complexes[i] = result.complexes[i].divide(n);
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = result[i].divide(Complex.from(n));
                 }
             }
             return result;
         }
-
-        public void print() {
-            for (Complex c : this.complexes) {
-                System.out.print(c);
-            }
-            System.out.println(System.lineSeparator());
-        }
     }
 
-
-    public static class Complex {
+    static final class Complex {
         private final double re;
         private final double im;
 
         public Complex(double re, double im) {
             this.re = re;
             this.im = im;
+        }
+
+        public static Complex from(long l) {
+            return new Complex(l, 0);
+        }
+
+        public long toLong() {
+            return Math.round(this.re);
         }
 
         public Complex multiply(Complex o) {
@@ -165,21 +161,17 @@ public class FftLib {
             return new Complex(re - o.re, im - o.im);
         }
 
-        public double abs() {
-            return Math.sqrt(re * re + im * im);
-        }
-
         //加法の単位元の取得
-        public static Complex ie1() {
+        private static Complex ie1() {
             return new Complex(0, 0);
         }
 
         //乗法の単位元の取得
-        public static Complex ie2() {
+        private static Complex ie2() {
             return new Complex(1, 0);
         }
 
-        public static Complex fromRadian(double radian) {
+        private static Complex fromRadian(double radian) {
             return new Complex(Math.cos(radian), Math.sin(radian));
         }
 
@@ -199,14 +191,15 @@ public class FftLib {
             return Complex.fromRadian(theta);
         }
 
-        public Complex divide(double d) {
-            return new Complex(re / d, im / d);
+        public Complex divide(Complex d) {
+            var m = (d.re * d.re) - (d.im * d.im);
+            var c = this.multiply(new Complex(d.re, -d.im));
+            return new Complex(c.re / m, c.im / m);
         }
 
         @Override
         public String toString() {
-            return "{" + re +
-                    ',' + im + "} ";
+            return "{" + re + ',' + im + "} ";
         }
     }
 }
