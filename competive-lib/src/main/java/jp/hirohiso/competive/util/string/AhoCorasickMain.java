@@ -50,15 +50,21 @@ public class AhoCorasickMain {
      * @param <T> パターンに関連付ける値の型
      */
     public static class AhoCorasick<T> {
-        /** アルファベットのサイズ（'a'から'z'までの26文字） */
+        /**
+         * アルファベットのサイズ（'a'から'z'までの26文字）
+         */
         static final int CHAR_SIZE = 26;
-        /** 文字コードのオフセット（'a'の文字コード） */
+        /**
+         * 文字コードのオフセット（'a'の文字コード）
+         */
         static final int MARGIN = 'a';
 
         /**
          * Aho-Corasickオートマトンを構築します。
          */
         public AhoCorasick() {
+            root.fail = root;
+            values.add(null);
             this.nodes.add(root);
         }
 
@@ -66,15 +72,26 @@ public class AhoCorasickMain {
          * Trieの各ノードを表すクラス
          */
         public static class Node {
-            /** ノードID（ノードの一意識別子） */
+            /**
+             * ノードID（ノードの一意識別子）
+             */
             int id;
-            /** 子ノードの配列（各文字に対応） */
+            int parent = -1;
+            /**
+             * 子ノードの配列（各文字に対応）
+             */
             Node[] children = new Node[CHAR_SIZE];
-            /** 失敗遷移（failure link）の遷移先 */
+            /**
+             * 失敗遷移（failure link）の遷移先
+             */
             Node fail;
-            /** このノードで受理されるパターンIDのリスト */
+            /**
+             * このノードで受理されるパターンIDのリスト
+             */
             List<Integer> accept = new ArrayList<>();
-            /** このノードを通るパターンの数 */
+            /**
+             * このノードを通るパターンの数
+             */
             int existCount = 0;
 
             /**
@@ -87,18 +104,24 @@ public class AhoCorasickMain {
             }
         }
 
-        /** Trieの根ノード */
+        /**
+         * Trieの根ノード
+         */
         private final Node root = new Node(0);
-        /** 全てのノードのリスト */
+        /**
+         * 全てのノードのリスト
+         */
         private final List<Node> nodes = new ArrayList<>();
-        /** パターンに関連付けられた値のリスト */
+        /**
+         * パターンに関連付けられた値のリスト
+         */
         private final List<T> values = new ArrayList<>();
 
         /**
          * ノードに受理するパターンIDを直接追加します。
          *
          * @param node 対象ノード
-         * @param id パターンID
+         * @param id   パターンID
          */
         public void updateDirect(Node node, int id) {
             node.accept.add(id);
@@ -107,36 +130,44 @@ public class AhoCorasickMain {
         /**
          * パターンを再帰的に追加します（内部メソッド）。
          *
-         * @param word 追加するパターン文字列
-         * @param value パターンに関連付ける値
+         * @param word      追加するパターン文字列
+         * @param value     パターンに関連付ける値
          * @param stringIdx 現在処理中の文字インデックス
-         * @param node 現在のノード
-         * @param id パターンID
+         * @param node      現在のノード
+         * @param id        パターンID
          */
         public void add(String word, T value, int stringIdx, Node node, int id) {
-            if (word.length() == stringIdx) {
-                updateDirect(node, id);
-                values.add(node.id, value);
-            } else {
-                var c = word.charAt(stringIdx) - MARGIN;
-                if (node.children[c] == null) {
-                    var newNode = new Node(nodes.size());
-                    node.children[c] = newNode;
-                    nodes.add(newNode);
-                    values.add(null);
+            var nowNode = node;
+            var nowIdx = stringIdx;
+            while (true) {
+                if (word.length() == nowIdx) {
+                    updateDirect(nowNode, id);
+                    values.set(nowNode.id, value);
+                    break;
+                } else {
+                    var c = word.charAt(nowIdx) - MARGIN;
+                    if (nowNode.children[c] == null) {
+                        var newNode = new Node(nodes.size());
+                        newNode.parent = nowNode.id;
+                        nowNode.children[c] = newNode;
+                        nodes.add(newNode);
+                        values.add(null);
+                    }
+                    var nextNode = nowNode.children[c];
+                    nowNode.existCount++;
+                    nowIdx++;
+                    nowNode = nextNode;
+                    //add(word, value, stringIdx + 1, nextNode, id);
                 }
-                var nextNode = node.children[c];
-                node.existCount++;
-                add(word, value, stringIdx + 1, nextNode, id);
             }
         }
 
         /**
          * パターンを指定されたIDで追加します。
          *
-         * @param word 追加するパターン文字列
+         * @param word  追加するパターン文字列
          * @param value パターンに関連付ける値
-         * @param id パターンID
+         * @param id    パターンID
          */
         public void add(String word, T value, int id) {
             add(word, value, 0, nodes.get(0), id);
@@ -145,7 +176,7 @@ public class AhoCorasickMain {
         /**
          * パターンを追加します（IDは自動採番）。
          *
-         * @param word 追加するパターン文字列
+         * @param word  追加するパターン文字列
          * @param value パターンに関連付ける値
          */
         public void add(String word, T value) {
@@ -209,7 +240,7 @@ public class AhoCorasickMain {
          * 時間計算量: O(テキストの長さ + マッチ数)
          * </p>
          *
-         * @param text 検索対象のテキスト
+         * @param text     検索対象のテキスト
          * @param callback マッチした際に呼ばれるコールバック（パターンIDを受け取る）
          * @return マッチ結果のリスト
          */
@@ -220,10 +251,10 @@ public class AhoCorasickMain {
         /**
          * テキストを走査してマッチ箇所を再帰的に検索します（内部メソッド）。
          *
-         * @param text 検索対象のテキスト
-         * @param callback マッチした際に呼ばれるコールバック
-         * @param strIndex 現在処理中のテキストのインデックス
-         * @param node 現在のノード
+         * @param text      検索対象のテキスト
+         * @param callback  マッチした際に呼ばれるコールバック
+         * @param strIndex  現在処理中のテキストのインデックス
+         * @param node      現在のノード
          * @param matchList マッチ結果を格納するリスト
          */
         private void query(String text, IntConsumer callback, int strIndex, Node node, List<Match<T>> matchList) {
@@ -245,10 +276,10 @@ public class AhoCorasickMain {
         /**
          * テキストを走査してマッチ箇所を返します（開始位置とノード指定版）。
          *
-         * @param text 検索対象のテキスト
+         * @param text     検索対象のテキスト
          * @param callback マッチした際に呼ばれるコールバック
          * @param strIndex 開始インデックス
-         * @param node 開始ノード
+         * @param node     開始ノード
          * @return マッチ結果のリスト
          */
         public List<Match<T>> query(String text, IntConsumer callback, int strIndex, Node node) {
@@ -263,15 +294,19 @@ public class AhoCorasickMain {
          * @param <T> パターンに関連付けられた値の型
          */
         public static class Match<T> {
-            /** マッチした位置（終端のインデックス） */
+            /**
+             * マッチした位置（終端のインデックス）
+             */
             public int pos;
-            /** パターンに関連付けられた値 */
+            /**
+             * パターンに関連付けられた値
+             */
             public T value;
 
             /**
              * マッチ結果を構築します。
              *
-             * @param pos マッチした位置
+             * @param pos   マッチした位置
              * @param value 関連付けられた値
              */
             public Match(int pos, T value) {
