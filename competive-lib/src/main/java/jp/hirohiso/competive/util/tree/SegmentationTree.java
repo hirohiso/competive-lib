@@ -1,6 +1,8 @@
 package jp.hirohiso.competive.util.tree;
 
+import java.util.Arrays;
 import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class SegmentationTree {
@@ -9,7 +11,7 @@ public class SegmentationTree {
 
         BinaryOperator<Integer> func = Integer::sum;
         SegmentTree<Integer> st = new SegmentTree<>(new Integer[]{1, 1, 2, 3, 5, 8, 13}, func);
-        st.debug();
+        //st.debug();
 
         System.out.println("区間[0,0):" + st.getRange(0, 1));
         System.out.println("区間[0,7):" + st.getRange(0, 7));
@@ -25,6 +27,24 @@ public class SegmentationTree {
         System.out.println("区間[0,7):" + st.getRange(0, 7));
         System.out.println("区間[0,6):" + st.getRange(0, 6));
         System.out.println("区間[2,5):" + st.getRange(2, 5));
+
+
+        st.debug();
+        System.err.println(Arrays.toString(st.array));
+        System.err.println(st.maxRight(0, (v) -> v <= 1));
+        System.err.println(st.maxRight(0, (v) -> v <= 2));
+        System.err.println(st.maxRight(0, (v) -> v <= 35));
+        System.err.println(st.maxRight(0, (v) -> v < 35));
+        System.err.println(st.maxRight(3, (v) -> v < 16));
+        System.err.println(st.maxRight(3, (v) -> v <= 16));
+
+        System.err.println("========");
+        System.err.println(st.minLeft(6, (v) -> v <= 1));
+        System.err.println(st.minLeft(6, (v) -> v <= 8));
+        System.err.println(st.minLeft(6, (v) -> v <= 12));
+        System.err.println(st.minLeft(6, (v) -> v <= 13));
+        System.err.println(st.minLeft(6, (v) -> v <= 35));
+        System.err.println(st.minLeft(7, (v) -> v < 35));
     }
 
     /**
@@ -57,15 +77,22 @@ public class SegmentationTree {
          */
         private BinaryOperator<T> operator;
 
+
+        /***
+         * 要素数
+         */
+        private int N;
+
         /**
          * 配列と演算子、単位元サプライヤーを指定してセグメント木を構築します。
          *
          * @param input 初期配列
-         * @param ope 区間を集約する二項演算子
-         * @param ie 単位元を提供するサプライヤー
+         * @param ope   区間を集約する二項演算子
+         * @param ie    単位元を提供するサプライヤー
          */
         public SegmentTree(T[] input, BinaryOperator<T> ope, Supplier<T> ie) {
             int size = input.length;
+            N = input.length;
             this.ie = ie;
             int n = 1;
             while (n < size) {
@@ -91,7 +118,7 @@ public class SegmentationTree {
          * サイズと演算子を指定してセグメント木を構築します（単位元なし）。
          *
          * @param size 配列のサイズ
-         * @param ope 区間を集約する二項演算子
+         * @param ope  区間を集約する二項演算子
          */
         public SegmentTree(int size, BinaryOperator<T> ope) {
             this(size, ope, null);
@@ -101,7 +128,7 @@ public class SegmentationTree {
          * 配列と演算子を指定してセグメント木を構築します（単位元なし）。
          *
          * @param input 初期配列
-         * @param ope 区間を集約する二項演算子
+         * @param ope   区間を集約する二項演算子
          */
         public SegmentTree(T[] input, BinaryOperator<T> ope) {
             this(input, ope, null);
@@ -111,8 +138,8 @@ public class SegmentationTree {
          * サイズと演算子、単位元サプライヤーを指定してセグメント木を構築します。
          *
          * @param size 配列のサイズ
-         * @param ope 区間を集約する二項演算子
-         * @param ie 単位元を提供するサプライヤー
+         * @param ope  区間を集約する二項演算子
+         * @param ie   単位元を提供するサプライヤー
          */
         @SuppressWarnings("unchecked")
         public SegmentTree(int size, BinaryOperator<T> ope, Supplier<T> ie) {
@@ -159,7 +186,7 @@ public class SegmentationTree {
          * 時間計算量: O(log n)
          * </p>
          *
-         * @param x 更新する要素のインデックス（0-based）
+         * @param x   更新する要素のインデックス（0-based）
          * @param val 新しい値
          */
         public void update(int x, T val) {
@@ -180,7 +207,7 @@ public class SegmentationTree {
          * 時間計算量: O(log n)
          * </p>
          *
-         * @param x マージする要素のインデックス（0-based）
+         * @param x   マージする要素のインデックス（0-based）
          * @param val マージする値
          */
         public void merge(int x, T val) {
@@ -196,7 +223,7 @@ public class SegmentationTree {
          * </p>
          *
          * @param start 区間の開始インデックス（含む）
-         * @param end 区間の終了インデックス（含まない）
+         * @param end   区間の終了インデックス（含まない）
          * @return 指定された区間を演算子で集約した結果
          */
         public T getRange(int start, int end) {
@@ -207,10 +234,10 @@ public class SegmentationTree {
          * 区間集約の内部実装（再帰処理）。
          *
          * @param start 要求区間の開始インデックス
-         * @param end 要求区間の終了インデックス
-         * @param k 現在のノードのインデックス
-         * @param l 現在のノードが表す区間の開始
-         * @param r 現在のノードが表す区間の終了
+         * @param end   要求区間の終了インデックス
+         * @param k     現在のノードのインデックス
+         * @param l     現在のノードが表す区間の開始
+         * @param r     現在のノードが表す区間の終了
          * @return 区間の集約結果
          */
         private T getRange(int start, int end, int k, int l, int r) {
@@ -243,13 +270,77 @@ public class SegmentationTree {
          * </p>
          *
          * @param index 内部配列のインデックス
-         * @param e 設定する要素
+         * @param e     設定する要素
          */
         private void setType(int index, T e) {
             if (e == null && ie != null) {
                 e = ie.get();
             }
             this.array[index] = (Object) e;
+        }
+
+        public int maxRight(int l, Predicate<T> f) {
+            if (l == N) {
+                return N;
+            }
+            l += (rowSize - 1);
+            T sum = null;
+            if (ie != null) {
+                sum = ie.get();
+            }
+            do {
+                while (l % 2 == 1) {
+                    l--;
+                    l >>= 1;
+                }
+                if (!f.test(operator.apply(sum, getType(l)))) {
+                    while (l < (rowSize - 1)) {
+                        l <<= 1;
+                        l++;
+                        if (f.test(operator.apply(sum, getType(l)))) {
+                            sum = operator.apply(sum, getType(l));
+                            l++;
+                        }
+                    }
+                    return l - (rowSize - 1);
+                }
+                sum = operator.apply(sum, getType(l));
+                l++;
+            } while (((l + 1) & -(l + 1)) != (l + 1));
+            return N;
+        }
+
+
+        public int minLeft(int r, Predicate<T> f) {
+            if (r == 0) {
+                return 0;
+            }
+            r--;
+            r += (rowSize - 1);
+            T sum = null;
+            if (ie != null) {
+                sum = ie.get();
+            }
+            do {
+                while (r % 2 == 0) {
+                    r--;
+                    r >>= 1;
+                }
+                if (!f.test(operator.apply(getType(r), sum))) {
+                    while (r < (rowSize - 1)) {
+                        r <<= 1;
+                        r += 2;
+                        if (f.test(operator.apply(getType(r), sum))) {
+                            sum = operator.apply(getType(r), sum);
+                            r--;
+                        }
+                    }
+                    return r + 1 - (rowSize - 1);
+                }
+                sum = operator.apply(getType(r), sum);
+                r--;
+            } while (((r + 1) & -(r + 1)) != (r + 1));
+            return 0;
         }
 
         /**
