@@ -5,13 +5,32 @@ import java.util.function.IntConsumer;
 
 public class AhoCorasickMain {
     public static void main(String[] args) {
+        var aho = new AhoCorasick<Integer>();
+
+        aho.add("hoge", 1);
+        aho.add("hogehoge", 2);
+        aho.add("gehoge", 3);
+        aho.add("hogehger", 4);
+        aho.add("ogeoge", 5);
+
+        for (var n : aho.nodes) {
+            System.out.println(n.id);
+            System.out.println(n.accept);
+        }
+        aho.build();
+
+        var list = aho.query("hogehogeogeoge", System.out::println);
+        System.out.println(list);
 
     }
 
-    // todo:Aho-Corasickアルゴリズムの実装
     public static class AhoCorasick<T> {
         static final int CHAR_SIZE = 26; // 'a'から'z'までの文字数
         static final int MARGIN = 'a';
+
+        public AhoCorasick() {
+            this.nodes.add(root);
+        }
 
         public static class Node {
             int id; // ノードID
@@ -49,6 +68,7 @@ public class AhoCorasickMain {
                     values.add(null);
                 }
                 var nextNode = node.children[c];
+                node.existCount++;
                 add(word, value, stringIdx + 1, nextNode, id);
             }
         }
@@ -98,14 +118,17 @@ public class AhoCorasickMain {
 
         /**
          * テキストを走査してマッチ箇所を返す
+         * <p>
+         * text内で一致するテキストを見つけた場合、callbackを呼び出し対応する頂点を渡します
          */
-        public void query(String text, IntConsumer callback) {
-            query(text, callback, 0, nodes.get(0));
+        public List<Match<T>> query(String text, IntConsumer callback) {
+            return query(text, callback, 0, nodes.get(0));
         }
 
-        public void query(String text, IntConsumer callback, int strIndex, Node node) {
+        private void query(String text, IntConsumer callback, int strIndex, Node node, List<Match<T>> matchList) {
             for (var id : node.accept) {
                 callback.accept(id);
+                matchList.add(new Match<>(strIndex, values.get(node.id)));
             }
             if (strIndex == text.length()) {
                 return;
@@ -114,8 +137,14 @@ public class AhoCorasickMain {
                 if (node.children[c] == null) {
                     return;
                 }
-                query(text, callback, strIndex + 1, node.children[c]);
+                query(text, callback, strIndex + 1, node.children[c], matchList);
             }
+        }
+
+        public List<Match<T>> query(String text, IntConsumer callback, int strIndex, Node node) {
+            var list = new ArrayList<Match<T>>();
+            query(text, callback, strIndex, node, list);
+            return list;
         }
 
         /**

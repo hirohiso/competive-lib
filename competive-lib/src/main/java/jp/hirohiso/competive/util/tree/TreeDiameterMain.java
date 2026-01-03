@@ -71,13 +71,13 @@ public class TreeDiameterMain {
                 dc--;
             }
 
-            return new ResultTuple(p.n, q.n, q.d, center);
+            return new ResultTuple(p.n, q.n, q.d, center, q.d % 2 == 1 ? this.parent[center] : center);
         }
 
         record InnerPair(int n, long d) {
         }
 
-        record ResultTuple(int n1, int n2, long d, int center) {
+        record ResultTuple(int n1, int n2, long d, int center1, int center2) {
         }
     }
 
