@@ -6,12 +6,19 @@ import java.util.stream.IntStream;
 public class SuffixArrayMain {
     public static void main(String[] args) {
 
+        var test = "bannana";
+        var sa = SuffixArray.sa(test);
+        var lcp = SuffixArray.lca(test, sa);
+
+        for (int i = 0; i < test.length(); i++) {
+            System.out.println(sa[i] + " " + lcp[i]);
+        }
 
         var rnd = new Random();
 
         var sumNaive = 0L;
         var sumIS = 0L;
-        var times = 1000;
+        var times = 10;
         for (int i = 0; i < times; i++) {
             var sb = new StringBuilder();
             for (int j = 0; j < rnd.nextInt(5000, 5001); j++) {
@@ -200,6 +207,31 @@ public class SuffixArrayMain {
         }
 
 
+        private static int[] lca(String str, int[] sa) {
+            var size = str.length();
+
+            var rank = new int[size];
+            var lcp = new int[size];
+            for (int i = 0; i < sa.length; i++) {
+                rank[sa[i]] = i;
+            }
+
+            var l = 0;
+            for (int i = 0; i < size; i++) {
+                if (rank[i] == 0) {
+                    lcp[0] = 0;
+                    continue;
+                }
+                var i1 = i;
+                var i2 = sa[rank[i] - 1];
+                while (i1 + l < size && i2 + l < size && str.charAt(i1 + l) == str.charAt(i2 + l)) {
+                    l++;
+                }
+                lcp[rank[i]] = l;
+                l = Math.max(0, l - 1);
+            }
+            return lcp;
+        }
     }
 
     public static class NaiveSuffixArray {
