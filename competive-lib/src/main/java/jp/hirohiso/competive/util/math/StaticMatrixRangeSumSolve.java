@@ -25,23 +25,20 @@ public class StaticMatrixRangeSumSolve {
         private long[][] acc;
 
         public StaticMatrixRangeSum(int[][] array) {
-            BiFunction<Integer,Integer,Long> function = (i,j) -> (long)array[i][j];
-            new StaticMatrixRangeSum(array.length,array[0].length,function);
-        }
-        public StaticMatrixRangeSum(long[][] array) {
-            BiFunction<Integer,Integer,Long> function = (i,j) -> array[i][j];
-            new StaticMatrixRangeSum(array.length,array[0].length,function);
+            this(array.length, array[0].length, (i, j) -> (long) array[i][j]);
         }
 
-        public StaticMatrixRangeSum(int n, int m, BiFunction<Integer,Integer,Long> function){
+        public StaticMatrixRangeSum(long[][] array) {
+            this(array.length, array[0].length, (i, j) -> array[i][j]);
+        }
+
+        public StaticMatrixRangeSum(int n, int m, BiFunction<Integer, Integer, Long> function) {
             acc = new long[n + 1][m + 1];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < m; j++) {
-                    acc[i + 1][j + 1] = acc[i + 1][j] + acc[i][j + 1] - acc[i][j] + function.apply(i,j);
+                    acc[i + 1][j + 1] = acc[i + 1][j] + acc[i][j + 1] - acc[i][j] + function.apply(i, j);
                 }
-                System.out.println(Arrays.toString(acc[i + 1]));
             }
-
         }
 
 
@@ -55,7 +52,7 @@ public class StaticMatrixRangeSumSolve {
          * @return
          */
         public long range(int x1, int y1, int x2, int y2) {
-            return (acc[x2][y2] + acc[x1][y1] - acc[x1][y2] - acc[x2][y1]);
+            return (acc[x2 + 1][y2 + 1] + acc[x1][y1] - acc[x1][y2 + 1] - acc[x2 + 1][y1]);
         }
     }
 }
