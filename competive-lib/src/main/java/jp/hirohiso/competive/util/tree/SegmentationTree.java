@@ -370,4 +370,65 @@ public class SegmentationTree {
         }
 
     }
+
+    //括弧列モノイド
+    record Parentheses(int sum, int min) {
+
+        public static Parentheses e = new Parentheses(0, 0);
+        public static Parentheses p = new Parentheses(1, 0);
+        public static Parentheses n = new Parentheses(-1, -1);
+
+
+        public Parentheses add(Parentheses other) {
+            return new Parentheses(this.sum + other.sum, Math.min(this.min, this.sum + other.min));
+        }
+
+        public boolean valid() {
+            return this.sum == 0 && this.min >= 0;
+        }
+    }
+
+    //区間最大部分和
+    record SubArrayMax(long sum, long prefixMax, long suffixMax, long best) {
+        public static SubArrayMax e = new SubArrayMax(0, 0, 0, 0);
+
+        public SubArrayMax add(SubArrayMax other) {
+            var sum = this.sum + other.sum;
+            var prefix = Math.max(this.prefixMax, this.sum + other.prefixMax);
+            var suffix = Math.max(other.suffixMax, this.suffixMax + other.sum);
+
+            var best = Math.max(
+                    Math.max(this.best, other.best),
+                    this.suffixMax + other.prefixMax
+            );
+            return new SubArrayMax(sum, prefix, suffix, best);
+        }
+    }
+
+
+    //関数合成
+    record FunctionComposition(long a, long b) {
+        public static FunctionComposition e = new FunctionComposition(1, 0);
+
+        //other(this())
+        public FunctionComposition add(FunctionComposition other) {
+            var a = this.a * other.a;
+            var b = this.b * other.a + other.b;
+            return new FunctionComposition(a, b);
+        }
+    }
+
+    //2 * 2 行列
+    record Matrix22(long a, long b, long c, long d) {
+        public static Matrix22 e = new Matrix22(1, 0, 0, 1);
+
+        public Matrix22 mul(Matrix22 other) {
+            var a = this.a * other.a + this.b * other.c;
+            var b = this.a * other.b + this.b * other.d;
+            var c = this.c * other.a + this.d * other.c;
+            var d = this.c * other.b + this.d * other.d;
+            return new Matrix22(a, b, c, d);
+        }
+    }
+
 }

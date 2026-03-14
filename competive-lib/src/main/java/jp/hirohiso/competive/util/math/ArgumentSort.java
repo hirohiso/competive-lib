@@ -23,7 +23,7 @@ public class ArgumentSort {
     }
 }
 
-record Point(int x, int y) implements Comparable<Point> {
+record Point(long x, long y) implements Comparable<Point> {
     @Override
     public int compareTo(Point o) {
         boolean h0 = (this.y < 0) || (this.y == 0 && this.x < 0); // (y0, x0) < (0, 0)
@@ -32,7 +32,7 @@ record Point(int x, int y) implements Comparable<Point> {
         int c = Boolean.compare(h0, h1); // false < true
         if (c != 0) return c;
         //偏角順で比較
-        return Integer.compare(y * o.x, x * o.y);
+        return Long.compare(y * o.x, x * o.y);
     }
 
     @Override
