@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -73,23 +74,42 @@ public class UnionFind {
     }
 
 
-    //重みつきUF
-    public static class PotentialDisjointSetUnion {
+    //重みつきUF（アーベル群版）
+    // combine: 群の二項演算 (a + b に相当)
+    // inverse: 逆元 (-a に相当)
+    // identity: 単位元 (0 に相当)
+    // 使用例
+    //  加算系（従来と同じ動作）
+    //  new PotentialDisjointSetUnion<>(n, Long::sum, x -> -x, 0L)
+    //
+    //  XOR系（差分 = XOR と同じ、逆元は自分自身）
+    //  new PotentialDisjointSetUnion<>(n, (a, b) -> a ^ b, x -> x, 0)
+    //
+    //  行列積（アーベル群なら何でも可）
+    //  new PotentialDisjointSetUnion<>(n, Matrix::multiply, Matrix::inverse, Matrix.identity())
+    public static class PotentialDisjointSetUnion<T> {
         int size;
         int[] parentsOrSize;
+        List<T> diffWeight;
+        BinaryOperator<T> combine;
+        UnaryOperator<T> inverse;
+        T identity;
 
-        long[] diffWeight;
-
-        public PotentialDisjointSetUnion(int size) {
+        public PotentialDisjointSetUnion(int size, BinaryOperator<T> combine, UnaryOperator<T> inverse, T identity) {
             this.size = size;
             this.parentsOrSize = new int[size];
-            this.diffWeight = new long[size];
+            this.combine = combine;
+            this.inverse = inverse;
+            this.identity = identity;
             Arrays.fill(parentsOrSize, -1);
+            diffWeight = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) diffWeight.add(identity);
         }
 
-        public int mergeSet(int x, int y, long w) {
-            w += weight(x);
-            w -= weight(y);
+        // mergeSet(x, y, w): weight(y) - weight(x) = w となるようにマージ
+        public int mergeSet(int x, int y, T w) {
+            w = combine.apply(w, weight(x));
+            w = combine.apply(w, inverse.apply(weight(y)));
             int i = root(x);
             int j = root(y);
 
@@ -101,12 +121,12 @@ public class UnionFind {
                 var temp = i;
                 i = j;
                 j = temp;
-                w = -w;
+                w = inverse.apply(w);
             }
             //iを代表としてxをマージする
             parentsOrSize[i] += parentsOrSize[j];
             parentsOrSize[j] = i;
-            diffWeight[j] = w;
+            diffWeight.set(j, w);
             return i;
         }
 
@@ -115,7 +135,7 @@ public class UnionFind {
                 return x;
             }
             int root = root(parentsOrSize[x]);
-            diffWeight[x] += diffWeight[parentsOrSize[x]];
+            diffWeight.set(x, combine.apply(diffWeight.get(x), diffWeight.get(parentsOrSize[x])));
             parentsOrSize[x] = root;
             return parentsOrSize[x];
         }
@@ -124,13 +144,14 @@ public class UnionFind {
             return root(x) == root(y);
         }
 
-        public long diff(int x, int y) {
-            return weight(y) - weight(x);
+        // diff(x, y) = weight(y) - weight(x)
+        public T diff(int x, int y) {
+            return combine.apply(weight(y), inverse.apply(weight(x)));
         }
 
-        private long weight(int x) {
+        private T weight(int x) {
             root(x);
-            return diffWeight[x];
+            return diffWeight.get(x);
         }
 
         public int size(int x) {

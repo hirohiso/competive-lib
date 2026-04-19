@@ -322,7 +322,7 @@ public class SegmentationTree {
                 sum = ie.get();
             }
             do {
-                while (r % 2 == 0) {
+                while (r > 0 && r % 2 == 0) {
                     r--;
                     r >>= 1;
                 }

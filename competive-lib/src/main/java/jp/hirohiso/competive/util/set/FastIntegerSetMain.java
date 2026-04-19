@@ -1,4 +1,4 @@
-package jp.hirohiso.competive.util.tree;
+package jp.hirohiso.competive.util.set;
 
 import java.util.LinkedList;
 import java.util.Random;
