@@ -114,6 +114,35 @@ public class LazySegmentationTree {
                     Act::e
             );
         }
+        {
+
+            //区間加算　区間二乗和
+            record Node(long v2, long v1, int size) {
+                static long mod = 998244353;
+                static public Node e() {
+                    return new Node(0, 0, 0);
+                }
+
+                public Node add(Node other) {
+                    return new Node((this.v2 + other.v2) % mod, (this.v1 + other.v1) % mod, this.size + other.size);
+                }
+            }
+
+            record Act(long a) {
+                static long mod = 998244353;
+                static public Act e() {
+                    return new Act(0L);
+                }
+
+                public Node apply(Node node) {
+                    return new Node((node.v2 + (2L * (a * node.v1) % mod) + ((long) node.size * (a * a % mod)) % mod), (node.v1 + (a * (long) node.size) % mod) % mod, node.size);
+                }
+
+                public Act compose(Act other) {
+                    return new Act((this.a + other.a) % mod);
+                }
+            }
+        }
 
         {
             //range update range sum

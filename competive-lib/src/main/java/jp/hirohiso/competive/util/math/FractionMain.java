@@ -50,6 +50,13 @@ public class FractionMain {
             }
             return new Fraction(p, q);
         }
+        //有理数公倍数
+        public Fraction fracLcm(Fraction f2) {
+            var gcd1 = gcd(this.p, f2.p);
+            var gcd2 = gcd(this.q, f2.q);
+            var lcm = (this.p / gcd1) * f2.p;
+            return Fraction.fromWithSimplify(lcm, gcd2);
+        }
 
         //最大公約数
         static long gcd(long a, long b) {

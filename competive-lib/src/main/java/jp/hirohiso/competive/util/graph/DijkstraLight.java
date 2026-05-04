@@ -1,14 +1,11 @@
 package jp.hirohiso.competive.util.graph;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class DijkstraLight {
 
     public static void main(String[] args) {
-        Dijkstra graph = new Dijkstra(4);
+        Dijkstra graph = new Dijkstra(4,7);
         graph.addEdge(0, 1, 5);
         graph.addEdge(0, 2, 2);
         graph.addEdge(1, 3, 1);
@@ -27,32 +24,32 @@ public class DijkstraLight {
         private int size = 0;
         private long[] disitance;
         //隣接リスト
-        private List<Edge>[] edgeList;
         private int[] parent;
+        private CsrBuilder csrBuilder;
 
-        //private edge[];
-        public Dijkstra(int size) {
+        public Dijkstra(int size, int esize) {
             this.size = size;
             this.disitance = new long[size];
-            this.edgeList = new ArrayList[size];
+            this.parent = new int[size];
             for (int i = 0; i < size; i++) {
                 this.disitance[i] = Long.MAX_VALUE;
-                this.edgeList[i] = new ArrayList<Edge>();
             }
-            this.parent = new int[size];
             for (int i = 0; i < size; i++) {
                 this.parent[i] = -1;
             }
+            this.csrBuilder = new CsrBuilder(size, esize);
         }
 
         public long[] getDistance() {
             return this.disitance;
         }
+
         public int[] getParent() {
             return this.parent;
         }
 
         public void solve(int root) {
+            var csr = csrBuilder.buildCsr();
             updateDistance(root, 0);
             Comparator<DistansNodeSet> comp = (DistansNodeSet e1, DistansNodeSet e2) -> e1.distans < e2.distans ? -1
                     : e1.distans > e2.distans ? 1 : 0;
@@ -65,9 +62,9 @@ public class DijkstraLight {
                 if (this.disitance[n] < pair.getDistans()) {
                     continue;
                 }
-                for (Edge e : this.edgeList[n]) {
-                    int node = e.otherNode;
-                    long cost = e.cost;
+                for (int i = csr.start[n]; i <csr.start[n + 1]; i++) {
+                    int node = csr.elist[i];
+                    long cost = csr.cost[i];
                     long newCost = this.disitance[n] + cost;
 
                     if (this.disitance[node] > newCost) {
@@ -80,8 +77,7 @@ public class DijkstraLight {
         }
 
         public void addEdge(int node1, int node2, long cost) {
-            Edge e = Edge.of(node2, cost);
-            this.edgeList[node1].add(e);
+            csrBuilder.addEdge(node1, node2, cost);
         }
 
         private void updateDistance(int node, long cost) {
@@ -110,18 +106,56 @@ public class DijkstraLight {
             }
         }
 
-        private static class Edge {
-            int otherNode;
-            long cost;
+        private class CsrBuilder {
+            int[] from;
+            int[] to;
+            long[] cost;
+            int idx = 0;
+            int n = 0;
+            int[] countEdgeFrom;
 
-            private Edge(int node, long cost) {
-                this.otherNode = node;
-                this.cost = cost;
+            public CsrBuilder(int n, int e) {
+                this.from = new int[e];
+                this.to = new int[e];
+                this.cost = new long[e];
+                Arrays.fill(from, -1);
+                Arrays.fill(to, -1);
+                this.n = n;
+                this.countEdgeFrom = new int[n];
             }
 
-            public static Edge of(int node, long cost) {
-                return new Edge(node, cost);
+            public void addEdge(int u, int v, long c) {
+                from[idx] = u;
+                to[idx] = v;
+                cost[idx] = c;
+                idx++;
+                countEdgeFrom[u]++;
             }
+
+            public Csr buildCsr() {
+                var elist = new int[idx];
+                var costList = new long[idx];
+
+                var fromAcc = new int[n + 1];
+                for (int i = 0; i < n; i++) {
+                    fromAcc[i + 1] = fromAcc[i] + countEdgeFrom[i];
+                }
+                int[] startFrom = Arrays.copyOf(fromAcc, fromAcc.length);
+
+                for (int i = 0; i < idx; i++) {
+                    var u = from[i];
+                    var v = to[i];
+                    var c = cost[i];
+
+                    elist[fromAcc[u]] = v;
+                    costList[fromAcc[u]] = c;
+                    fromAcc[u]++;
+                }
+                return new Csr(elist, costList, startFrom);
+            }
+        }
+
+        record Csr(int[] elist, long[] cost, int[] start) {
         }
 
     }
