@@ -405,6 +405,32 @@ public class SegmentationTree {
         }
     }
 
+    //半環上の区間最大部分和
+    record SubArrayRingMax<T>(T sum, T prefixMax, T suffixMax, T best) {
+
+        private T add(T v1, T v2) {
+            //半環の加算を定義する
+            return null;
+        }
+
+        private T mulch(T v1, T v2) {
+            //半環の乗算を定義する
+            return null;
+        }
+
+        public SubArrayRingMax<T> add(SubArrayRingMax<T> other) {
+            var sum = this.mulch(this.sum, other.sum);
+            var prefix = this.add(this.prefixMax, this.mulch(this.sum, other.prefixMax));
+            var suffix = this.add(other.suffixMax, this.mulch(this.suffixMax, other.sum));
+
+            var best = this.add(
+                    this.add(this.best, other.best),
+                    this.mulch(this.suffixMax, other.prefixMax)
+            );
+            return new SubArrayRingMax<>(sum, prefix, suffix, best);
+        }
+    }
+
 
     //関数合成
     record FunctionComposition(long a, long b) {
