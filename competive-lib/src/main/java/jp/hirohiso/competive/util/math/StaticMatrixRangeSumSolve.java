@@ -6,15 +6,125 @@ import java.util.function.Function;
 
 public class StaticMatrixRangeSumSolve {
     public static void main(String[] args) {
-        var acc = new int[][]{
-                {1, 2, 3},
-                {4, 5, 6},
-                {7, 8, 9}};
-        var mrs = new StaticMatrixRangeSum(acc);
-        System.out.println(mrs.range(0, 0, 1, 1));
-        System.out.println(mrs.range(0, 0, 3, 3));
-        System.out.println(mrs.range(1, 1, 2, 2));
-        System.out.println(mrs.range(1, 1, 3, 2));
+        var mrs1 = new MultiRangeSum(10, 9);
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 9; j++) {
+                mrs1.update(i * j, i, j);
+            }
+        }
+        mrs1.build();
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 9; j++) {
+                var ans = mrs1.rangeSum(new int[]{i, j}, new int[]{i, j});
+                System.out.print(ans + " ");
+            }
+            System.out.println();
+        }
+
+        for (int i = 1; i < 10; i++) {
+            for (int j = 1; j < 9; j++) {
+                var ans = mrs1.rangeSum(new int[]{i, j}, new int[]{0, 0});
+                System.out.print(ans + " ");
+            }
+            System.out.println();
+        }
+    }
+
+
+    public static class MultiRangeSum {
+        int[] dims;
+        int[] mul;
+
+        long[] flattenArr;
+
+        boolean isBuild = false;
+
+        public MultiRangeSum(int... arr) {
+            dims = new int[arr.length];
+            for (int i = 0; i < dims.length; i++) {
+                dims[i] = arr[i] + 1;
+            }
+
+            var base = 1;
+            mul = new int[dims.length];
+            for (int i = 0; i < dims.length; i++) {
+                base *= dims[i];
+                mul[i] = base;
+            }
+            flattenArr = new long[mul[mul.length - 1]];
+        }
+
+        public void update(long v, int... arr) {
+            if (isBuild) {
+                throw new IllegalStateException("after build");
+            }
+            var temp = Arrays.copyOf(arr, arr.length);
+            for (int i = 0; i < temp.length; i++) {
+                temp[i]++;
+            }
+            var idx = idx(temp);
+            flattenArr[idx] = v;
+        }
+
+        public void build() {
+            if (isBuild) {
+                throw new IllegalStateException("after build");
+            }
+            isBuild = true;
+            var size = mul.length;
+            for (int i = 0; i < size; i++) {
+                //i次元方向の増分
+                var d = mul[i] / dims[i];
+                for (int j = 0; j < flattenArr.length; j++) {
+                    //d方向に加算。閾値は考慮
+                    var nj = j + d;
+                    if (nj / mul[i] == j / mul[i]) {
+                        System.err.println(nj + " : " + j + " : " + d + " < " + flattenArr[j]);
+                        flattenArr[nj] += flattenArr[j];
+                    }
+                }
+            }
+        }
+
+        public long rangeSum(int[] arr1, int[] arr2) {
+            if (!isBuild) {
+                throw new IllegalStateException("before build");
+            }
+            var temp1 = new int[arr1.length];
+            var temp2 = new int[arr2.length];
+            for (int i = 0; i < arr1.length; i++) {
+                temp1[i] = arr1[i] + 1;
+                temp2[i] = arr2[i];
+            }
+
+            var size = temp1.length;
+            var max = 1 << size;
+
+            var ans = 0L;
+            for (int i = 0; i < max; i++) {
+                var pos = (Integer.bitCount(i) % 2 == 0) ? 1 : -1;//偶数なら加算、奇数なら原産
+                var arr = new int[temp1.length];
+                for (int j = 0; j < size; j++) {
+                    if ((i & (1 << j)) != 0) {
+                        arr[j] = temp1[j];
+                    } else {
+                        arr[j] = temp2[j];
+                    }
+                }
+                var idx = idx(arr);
+                ans += (pos) * flattenArr[idx];
+            }
+            return ans;
+        }
+
+        private int idx(int... arr) {
+            var idx = 0;
+            for (int i = 0; i < arr.length; i++) {
+                idx += arr[i] * (i != 0 ? mul[i - 1] : 1);
+            }
+            return idx;
+        }
     }
 
 
