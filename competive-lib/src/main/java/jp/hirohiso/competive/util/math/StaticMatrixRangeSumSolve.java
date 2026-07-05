@@ -80,13 +80,14 @@ public class StaticMatrixRangeSumSolve {
                     //d方向に加算。閾値は考慮
                     var nj = j + d;
                     if (nj / mul[i] == j / mul[i]) {
-                        System.err.println(nj + " : " + j + " : " + d + " < " + flattenArr[j]);
                         flattenArr[nj] += flattenArr[j];
                     }
                 }
             }
         }
 
+        //arr1からarr2までの範囲をの累積和を求める
+        //arr[j] >= arr2[j]が成立していること
         public long rangeSum(int[] arr1, int[] arr2) {
             if (!isBuild) {
                 throw new IllegalStateException("before build");
