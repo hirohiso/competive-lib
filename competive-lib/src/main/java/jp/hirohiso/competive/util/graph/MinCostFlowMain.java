@@ -2,9 +2,9 @@ package jp.hirohiso.competive.util.graph;
 
 import java.util.*;
 
-public class MinMaxFlowMain {
+public class MinCostFlowMain {
     public static void main(String[] args) {
-        var mmf = new MinMaxFlow(4);
+        var mmf = new MinCostFlow(4);
 
         mmf.addEdge(0, 1, 1, 3);
         mmf.addEdge(0, 2, 1, 1);
@@ -18,8 +18,7 @@ public class MinMaxFlowMain {
 
     }
 
-    //todo: MinMaxFlowの実装
-    public static class MinMaxFlow {
+    public static class MinCostFlow {
         // 実装はここに記述
         // 例: 最小費用流量を求めるアルゴリズム
         //https://github.com/NASU41/AtCoderLibraryForJava/tree/master/MinCostFlow
@@ -32,11 +31,11 @@ public class MinMaxFlowMain {
 
         long INF = Long.MAX_VALUE;
 
-        public MinMaxFlow(int size) {
+        public MinCostFlow(int size) {
             this(size, Math.min(size * (size - 1) / 2, 10 * size));
         }
 
-        public MinMaxFlow(int vSize, int eSize) {
+        public MinCostFlow(int vSize, int eSize) {
             n = vSize;
             m = eSize;
             builder = new CsrBuilder(n, m);
