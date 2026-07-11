@@ -19,8 +19,7 @@ public class MinCostFlowMain {
     }
 
     public static class MinCostFlow {
-        // 実装はここに記述
-        // 例: 最小費用流量を求めるアルゴリズム
+        // 参考
         //https://github.com/NASU41/AtCoderLibraryForJava/tree/master/MinCostFlow
 
         int n;
@@ -41,8 +40,8 @@ public class MinCostFlowMain {
             builder = new CsrBuilder(n, m);
         }
 
-        public int addEdge(int from, int to, long cost, long capacity) {
-            return builder.addEdge(from, to, cost, capacity);
+        public int addEdge(int from, int to, long capacity, long cost) {
+            return builder.addEdge(from, to, capacity, cost);
         }
 
         public CostAndFlow flow(int s, int t) {
@@ -67,12 +66,11 @@ public class MinCostFlowMain {
 
             var flow = 0L;
             var cost = 0L;
-            var preCost = -1L;
+            var preD = -1L;
 
             var result = new LinkedList<CostAndFlow>();
             result.add(new CostAndFlow(cost, flow));
 
-            var count = 0;
             while (flow < flowLimit) {
                 //dualの処理を呼び出す
                 if (!dualRef(s, t, dual, dist, prevE, visited)) {
@@ -93,17 +91,12 @@ public class MinCostFlowMain {
                 var d = -dual[s];
                 flow += c;
                 cost += c * d;
-                if (cost == preCost) {
+                if (d == preD) {
                     result.removeLast();
                 }
                 result.add(new CostAndFlow(cost, flow));
-                preCost = cost;
-                if (10 < ++count) {
-                    break;
-                }
+                preD = d;
             }
-
-
             return result;
         }
 
@@ -117,13 +110,11 @@ public class MinCostFlowMain {
             Arrays.fill(prevE, -1);
             Arrays.fill(vis, false);
 
-            var pq = new PriorityQueue<State>(
-                    Comparator.comparingLong(State::dis)
-            );
+            var heap = new DIsVerMinHeap(2 * m);
             dist[s] = 0;
-            pq.add(new State(0L, s));
-            while (!pq.isEmpty()) {
-                var v = pq.poll().v;
+            heap.add(0L, s);
+            while (!heap.isEmpty()) {
+                var v = heap.poll().v;
                 if (vis[v]) {
                     continue;
                 }
@@ -143,7 +134,7 @@ public class MinCostFlowMain {
                     if (dist[next] - dist[v] > nc) {
                         dist[next] = dist[v] + nc;
                         prevE[next] = i;
-                        pq.add(new State(dist[next], next));
+                        heap.add(dist[next], next);
                     }
                 }
             }
@@ -190,7 +181,7 @@ public class MinCostFlowMain {
                 this.degree = new int[n];
             }
 
-            public int addEdge(int u, int v, long c, long cap) {
+            public int addEdge(int u, int v, long cap, long c) {
                 from[idx] = u;
                 to[idx] = v;
                 cost[idx] = c;
@@ -233,6 +224,122 @@ public class MinCostFlowMain {
                     edgeIdx[i] = fwdPos;
                 }
                 return new Csr(elist, costList, capacityList, start, rev, edgeIdx);
+            }
+        }
+
+        private static class DIsVerMinHeap {
+            private long[] dis;
+            private int[] vertex;
+            private int size;
+
+            public record ValuePair(long dis, int v) {
+            }
+
+            ;
+
+            public DIsVerMinHeap(int initialCapacity) {
+                dis = new long[Math.max(1, initialCapacity)];
+                vertex = new int[Math.max(1, initialCapacity)];
+            }
+
+            public int size() {
+                return size;
+            }
+
+            public boolean isEmpty() {
+                return size == 0;
+            }
+
+            public void clear() {
+                size = 0;
+            }
+
+            public ValuePair peek() {
+                if (size == 0) {
+                    throw new IllegalStateException("Heap is empty");
+                }
+                return new ValuePair(dis[0], vertex[0]);
+            }
+
+            public void add(long value, int v) {
+                if (size == dis.length) {
+                    grow();
+                }
+
+                int i = size++;
+                while (i > 0) {
+                    int parent = (i - 1) >>> 1;
+                    long parentDis = dis[parent];
+                    int parentV = vertex[parent];
+
+                    if (parentDis <= value) {
+                        break;
+                    }
+
+                    dis[i] = parentDis;
+                    vertex[i] = parentV;
+                    i = parent;
+                }
+                dis[i] = value;
+                vertex[i] = v;
+            }
+
+            public ValuePair poll() {
+                if (size == 0) {
+                    throw new IllegalStateException("Heap is empty");
+                }
+
+                long resultDis = dis[0];
+                int resultV = vertex[0];
+                long valueDis = dis[--size];
+                int valueV = vertex[size];
+
+                if (size == 0) {
+                    return new ValuePair(resultDis, resultV);
+                }
+
+                int i = 0;
+                int half = size >>> 1; // 葉でない頂点の範囲
+
+                while (i < half) {
+                    int left = (i << 1) + 1;
+                    int right = left + 1;
+
+                    int child = left;
+                    long childValue = dis[left];
+                    int childV = vertex[left];
+
+                    if (right < size && dis[right] < childValue) {
+                        child = right;
+                        childValue = dis[right];
+                        childV = vertex[right];
+                    }
+
+                    if (valueDis <= childValue) {
+                        break;
+                    }
+
+                    dis[i] = childValue;
+                    vertex[i] = childV;
+                    i = child;
+                }
+
+                dis[i] = valueDis;
+                vertex[i] = valueV;
+                return new ValuePair(resultDis, resultV);
+            }
+
+            private void grow() {
+                {
+                    int oldCapacity = dis.length;
+                    int newCapacity = oldCapacity + (oldCapacity >>> 1) + 1;
+                    dis = java.util.Arrays.copyOf(dis, newCapacity);
+                }
+                {
+                    int oldCapacity = vertex.length;
+                    int newCapacity = oldCapacity + (oldCapacity >>> 1) + 1;
+                    vertex = java.util.Arrays.copyOf(vertex, newCapacity);
+                }
             }
         }
 
