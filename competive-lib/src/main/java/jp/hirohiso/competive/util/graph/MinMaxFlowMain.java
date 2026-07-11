@@ -1,7 +1,6 @@
 package jp.hirohiso.competive.util.graph;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class MinMaxFlowMain {
     public static void main(String[] args) {
@@ -15,10 +14,7 @@ public class MinMaxFlowMain {
 
 
         var ret = mmf.flowSlope(0, 3);
-
-        for (int i = 0; i < 5; i++) {
-            System.out.println(mmf.getEdge(i));
-        }
+        System.err.println(ret);
 
     }
 
@@ -33,6 +29,8 @@ public class MinMaxFlowMain {
 
         CsrBuilder builder;
         Csr csr;
+
+        long INF = Long.MAX_VALUE;
 
         public MinMaxFlow(int size) {
             this(size, Math.min(size * (size - 1) / 2, 10 * size));
@@ -49,27 +47,120 @@ public class MinMaxFlowMain {
         }
 
         public CostAndFlow flow(int s, int t) {
-            return null;
+            return flow(s, t, INF);
         }
 
         public CostAndFlow flow(int s, int t, long flowLimit) {
-            return null;
+            return flowSlope(s, t, flowLimit).getLast();
         }
 
         public List<CostAndFlow> flowSlope(int s, int t) {
-            csr = builder.buildCsr();
-            return null;
+            return flowSlope(s, t, INF);
         }
 
         public List<CostAndFlow> flowSlope(int s, int t, long flowLimit) {
-            return null;
+            csr = builder.buildCsr();
+
+            var dual = new long[n];
+            var dist = new long[n];
+            var visited = new boolean[n];
+            var prevE = new int[n];
+
+            var flow = 0L;
+            var cost = 0L;
+            var preCost = -1L;
+
+            var result = new LinkedList<CostAndFlow>();
+            result.add(new CostAndFlow(cost, flow));
+
+            var count = 0;
+            while (flow < flowLimit) {
+                //dualの処理を呼び出す
+                if (!dualRef(s, t, dual, dist, prevE, visited)) {
+                    break;
+                }
+                var c = flowLimit - flow;
+                for (int i = t; i != s; i = csr.elist[csr.rev[prevE[i]]]) {
+                    c = Math.min(c, csr.capacity[prevE[i]]);
+                }
+                for (int i = t; i != s; i = csr.elist[csr.rev[prevE[i]]]) {
+                    var e = prevE[i];
+                    var re = csr.rev[e];
+                    csr.capacity[e] -= c;
+                    csr.capacity[re] += c;
+                }
+
+
+                var d = -dual[s];
+                flow += c;
+                cost += c * d;
+                if (cost == preCost) {
+                    result.removeLast();
+                }
+                result.add(new CostAndFlow(cost, flow));
+                preCost = cost;
+                if (10 < ++count) {
+                    break;
+                }
+            }
+
+
+            return result;
         }
 
-        //build 後、辺 ID i の情報はこう復元します。Step 2 のテストで assert しておくと後段のデバッグが楽になります。
-        //
-        //- 順辺の位置: e = edgeIdx[i]、逆辺の位置: rev[e]
-        //- 流れた量: flow = csrCap[rev[e]](逆辺の cap は増えた分 = 流量)
-        //- 元の容量: csrCap[e] + csrCap[rev[e]]
+        record State(long dis, int v) {
+        }
+
+        ;
+
+        private boolean dualRef(int s, int t, long[] dual, long[] dist, int[] prevE, boolean[] vis) {
+            Arrays.fill(dist, INF);
+            Arrays.fill(prevE, -1);
+            Arrays.fill(vis, false);
+
+            var pq = new PriorityQueue<State>(
+                    Comparator.comparingLong(State::dis)
+            );
+            dist[s] = 0;
+            pq.add(new State(0L, s));
+            while (!pq.isEmpty()) {
+                var v = pq.poll().v;
+                if (vis[v]) {
+                    continue;
+                }
+                vis[v] = true;
+                if (v == t) {
+                    break;
+                }
+                for (int i = csr.start[v]; i < csr.start[v + 1]; i++) {
+                    var cost = csr.cost[i];
+                    var next = csr.elist[i];
+                    var cap = csr.capacity[i];
+                    if (vis[next] || cap == 0) {
+                        continue;
+                    }
+
+                    var nc = cost - dual[next] + dual[v];
+                    if (dist[next] - dist[v] > nc) {
+                        dist[next] = dist[v] + nc;
+                        prevE[next] = i;
+                        pq.add(new State(dist[next], next));
+                    }
+                }
+            }
+            if (!vis[t]) {
+                return false;
+            }
+
+            for (int i = 0; i < n; i++) {
+                if (!vis[i]) {
+                    continue;
+                }
+                dual[i] -= dist[t] - dist[i];
+            }
+            return true;
+        }
+
         public Edge getEdge(int i) {
             var e = csr.edgeIdx[i];
             var re = csr.rev[e];
