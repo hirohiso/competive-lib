@@ -4,6 +4,7 @@ public class FractionMain {
     public static void main(String[] args) {
 
     }
+
     //有理数表現 p /q
     record Fraction(long p, long q) implements Comparable<Fraction> {
         public boolean isUndefined() {
@@ -24,6 +25,26 @@ public class FractionMain {
 
         public boolean isNegativeInfinity() {
             return isNegative() && q == 0;
+        }
+
+        //オーバーフロー対策未
+        public Fraction add(Fraction other) {
+            var np = this.p * other.q + this.q * other.p;
+            var nq = this.q * other.q;
+            return Fraction.fromWithSimplify(np, nq);
+        }
+
+        //オーバーフロー対策未
+        public Fraction mulch(Fraction other) {
+            var np = this.p * other.p;
+            var nq = this.q * other.q;
+            return Fraction.fromWithSimplify(np, nq);
+        }
+
+        public Fraction inv() {
+            var np = this.q;
+            var nq = this.p;
+            return Fraction.fromWithSimplify(np, nq);
         }
 
         public static Fraction fromWithSimplify(long p, long q) {
@@ -50,6 +71,7 @@ public class FractionMain {
             }
             return new Fraction(p, q);
         }
+
         //有理数公倍数
         public Fraction fracLcm(Fraction f2) {
             var gcd1 = gcd(this.p, f2.p);
