@@ -20,6 +20,13 @@ public class DijkstraLight {
 
     //有向グラフ版お手軽ダイクストラ
     //O(E + V log V)
+    /**
+     * 非負重みの有向グラフの単一始点最短路。
+     * <p>頂点は [0,N)、辺数上限 esize を構築時に指定する。全ての辺を追加後に
+     * solve を一度呼ぶ。距離・中間和は long に収まり Long.MAX_VALUE 未満であること。
+     * 到達不能の距離は Long.MAX_VALUE、親は -1。親配列で経路を復元できる。
+     * 計算量 O((N+M) log(M+1))、領域 O(N+M)。戻り配列は内部配列なので変更しないこと。</p>
+     */
     public static class Dijkstra {
         private int size = 0;
         private long[] disitance;

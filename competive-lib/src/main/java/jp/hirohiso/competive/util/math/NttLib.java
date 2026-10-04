@@ -10,6 +10,13 @@ public class NttLib {
         System.out.println(str);
     }
 
+    /**
+     * 法998244353の数論変換と畳み込み。
+     * <p>入力係数は [0,998244353)、convolution の両配列は非空。
+     * 結果長は a.length+b.length-1。必要な2冪長 L は 2^23 以下。
+     * fft/ifft の入力長は対応する2冪。時間 O(L log L)、領域 O(L)。
+     * 整数畳み込みではなく法を取った結果である。</p>
+     */
     static class NumberTheoreticTransform {
         private NttRing ie1;
         private NttRing ie2;

@@ -16,6 +16,12 @@ public class UnionFind {
     }
 
     //ALC準拠
+    /**
+     * 素集合の併合と連結判定。頂点は {@code [0, size)}。
+     * <p>初期化 O(N)、併合・代表取得は償却 O(α(N))、領域 O(N)。
+     * 同じ集合の再併合は何もしない。代表の番号と groups の列挙順は保証しない。
+     * 経路圧縮により root や照会も内部状態を更新する。</p>
+     */
     public static class DisjointSetUnion {
         int size;
         int[] parentsOrSize;
@@ -85,8 +91,14 @@ public class UnionFind {
     //  XOR系（差分 = XOR と同じ、逆元は自分自身）
     //  new PotentialDisjointSetUnion<>(n, (a, b) -> a ^ b, x -> x, 0)
     //
-    //  行列積（アーベル群なら何でも可）
-    //  new PotentialDisjointSetUnion<>(n, Matrix::multiply, Matrix::inverse, Matrix.identity())
+    //  一般の行列積は可換でないため、この実装の対象外。
+    /**
+     * アーベル群上の差分制約を保持する Union-Find。
+     * <p>{@code mergeSet(x,y,w)} は weight(y)-weight(x)=w を設定し、
+     * {@code diff(x,y)} は同じ向きの差を返す。差分照会は連結な頂点間のみ有効。
+     * 演算は可換な群であること（一般の行列積は不可）。既に連結な頂点の
+     * 矛盾検出は行わない。初期化 O(N)、操作は群演算 O(1) のとき償却 O(α(N))。</p>
+     */
     public static class PotentialDisjointSetUnion<T> {
         int size;
         int[] parentsOrSize;
@@ -172,6 +184,12 @@ public class UnionFind {
 
 
     //可換モノイド　UF
+    /**
+     * 各連結成分の集約値を保持する Union-Find（差分制約とは別物）。
+     * <p>init は頂点数と同じ長さ。ope は結合的かつ可換な演算とする。
+     * value(x) は x の成分全体の集約値。重複併合では二重加算しない。
+     * 初期化 O(N)、操作は演算 O(1) のとき償却 O(α(N))、領域 O(N)。</p>
+     */
     public static class WeightedDisjointSetUnion<T> {
         int size;
         int[] parentsOrSize;

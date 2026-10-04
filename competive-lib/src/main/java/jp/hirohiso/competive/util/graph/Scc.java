@@ -31,6 +31,13 @@ public class Scc {
     }
 
 
+    /**
+     * 有向グラフの強連結成分分解。
+     * <p>N は正、頂点は [0,N)、辺数上限を構築時に指定し、辺追加後に solve を一度呼ぶ。
+     * getResultScc の成分順はトポロジカル順。getDag はその添字を頂点とする
+     * 縮約グラフで平行辺を残す。計算量・領域 O(N+M)。DFSは再帰で実装されており、
+     * 深い鎖では実行環境のスタック上限に注意。</p>
+     */
     public static class SccSolver {
         private final int size;
 
@@ -200,8 +207,8 @@ public class Scc {
         }
 
         /**
-         * @param a 0 <= a < size
-         * @param b 0 <= b < size
+         * @param a 辺の始点 {@code 0 <= a < size}
+         * @param b 辺の終点 {@code 0 <= b < size}
          */
         public void addDirectEdge(int a, int b) {
             this.csrBuilder.addEdge(a, b);

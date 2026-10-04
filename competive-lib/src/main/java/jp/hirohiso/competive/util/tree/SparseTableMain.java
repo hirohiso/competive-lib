@@ -22,14 +22,12 @@ public class SparseTableMain {
     }
 
     /**
-     * Tおよび結合律と冪等性を満たす演算ope
-     * <p>
-     * 単位元や逆元がなくても使用可能
-     * 更新なし
-     * 構築 O(n logn)
-     * クエリ O(1)
+     * 更新しない配列の区間集約を O(1) で求める Sparse Table。
+     * <p>演算は結合的かつ冪等であること（min/max/gcd 等。和は不可）。
+     * 入力は非空。query(l,r) は {@code 0 <= l < r <= N} の半開区間。
+     * 構築・領域 O(N log N)。入力配列の変更は反映されない。</p>
      */
-    private static class SparseTable<T> {
+    static class SparseTable<T> {
 
         BinaryOperator<T> ope;
         List<List<T>> list;
@@ -63,9 +61,9 @@ public class SparseTableMain {
 
         /**
          * [l,r)のクエリ処理。
-         * @param l　含む 1<=
-         * @param r　含まない　<= N
-         * @return
+         * @param l 含む左端 {@code 0 <= l < r}
+         * @param r 含まない右端 {@code l < r <= N}
+         * @return 区間の集約値
          */
 
         public T query(int l, int r) {

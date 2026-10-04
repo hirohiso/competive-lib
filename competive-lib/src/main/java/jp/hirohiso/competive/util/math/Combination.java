@@ -10,6 +10,12 @@ public class Combination {
         System.out.println(com.cal(0, 3));
     }
 
+    /**
+     * 素数法に対する階乗・逆階乗を前処理する二項係数計算。
+     * <p>構築時に {@code 2 <= max <= mod}、mod は素数であること。
+     * 前処理・領域 O(max)、cal(n,k) は O(1)。有効な n の上限は max-1。
+     * n または k が負、あるいは k が n より大きい場合は0を返す。</p>
+     */
     static class CombinationHelper {
         final int MAX;
         final int MOD;

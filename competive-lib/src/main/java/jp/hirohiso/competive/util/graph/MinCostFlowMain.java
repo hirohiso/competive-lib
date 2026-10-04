@@ -18,6 +18,14 @@ public class MinCostFlowMain {
 
     }
 
+    /**
+     * ポテンシャル付き最短路による最小費用流。
+     * <p>頂点は [0,N)、始点と終点は異なり、初期容量・費用は非負。
+     * 容量・距離・費用の積と総和は long に収まること。辺追加後に flow/flowSlope を呼ぶ。
+     * flowLimit 以下で可能な最大流量とその最小費用を返す。到達不能なら (費用0,流量0)。
+     * 呼出しごとに元の辺から残余グラフを再構築する。getEdge は計算後に使用する。
+     * 増加回数 A に対して O(A(N+M) log(N+M))、領域 O(N+M)。</p>
+     */
     public static class MinCostFlow {
         // 参考
         //https://github.com/NASU41/AtCoderLibraryForJava/tree/master/MinCostFlow

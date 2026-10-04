@@ -15,6 +15,14 @@ public class DoublingMain {
     //f(u, K + 1) := f(f(u,k),k)
     //g(u, k + 1) := g(u , k) + g(f(u,k),k) でダブリングによる事前計算を行い
     //各種 g(u,k)をlog kで回答する
+    /**
+     * 各頂点からの一意な遷移と通過値の集約を前処理する。
+     * <p>N は正、頂点は [0,N)。set 後に build を呼び、range(u,gene) で
+     * gene 回分を順序通りに集約する。gene=0 は単位元。
+     * 対応する gene は {@code 0 <= gene < 2^baseSize}。段数は頂点数由来なので
+     * 任意の巨大な遷移回数には対応しない。構築・領域 O(N log N)、照会 O(log N)。
+     * func は結合的で e が単位元、非可換でもよい。</p>
+     */
     static class Doubling<T> {
         int[][] parent;
         int baseSize;
@@ -53,7 +61,7 @@ public class DoublingMain {
 
                     doublingValue[i][base] = func.apply(
                             doublingValue[i][base - 1],
-                            doublingValue[parent[i][base - 1]][base]
+                            doublingValue[parent[i][base - 1]][base - 1]
                     );
                 }
             }

@@ -48,13 +48,10 @@ public class SegmentationTree {
     }
 
     /**
-     * セグメント木（Segment Tree）を実装するクラス。
-     * <p>
-     * セグメント木は、配列の区間に対する集約クエリと要素の更新を高速に処理するデータ構造です。
-     * 時間計算量は、クエリ・更新ともにO(log n)です。
-     * </p>
-     *
-     * @param <T> 要素の型
+     * 点更新と半開区間 {@code [l,r)} の順序付き集約を行うセグメント木。
+     * <p>添字は0始まり。演算は結合的であること。単位元を省略すると null が
+     * 空区間・未設定要素を表す。構築 O(N)、更新・集約・境界探索 O(log N)、領域 O(N)。
+     * 渡す演算は引数を破壊しないこと。非可換な演算も左から右の順に集約する。</p>
      */
     public static class SegmentTree<T> {
         /**
@@ -242,7 +239,7 @@ public class SegmentationTree {
          */
         private T getRange(int start, int end, int k, int l, int r) {
             if (r <= start || end <= l) {
-                return null;
+                return ie == null ? null : ie.get();
             }
             if (start <= l && r <= end) {
                 return getType(k);
@@ -279,67 +276,51 @@ public class SegmentationTree {
             this.array[index] = (Object) e;
         }
 
+        /**
+         * 単調な述語が真である最大の右端を O(log N) で求める。
+         * {@code 0 <= l <= N}、単位元に対して述語が真であることが必要。
+         */
         public int maxRight(int l, Predicate<T> f) {
-            if (l == N) {
-                return N;
-            }
-            l += (rowSize - 1);
-            T sum = null;
-            if (ie != null) {
-                sum = ie.get();
-            }
+            if (l == N) return N;
+            int k = l + rowSize;
+            T sum = ie == null ? null : ie.get();
             do {
-                while (l % 2 == 1) {
-                    l--;
-                    l >>= 1;
-                }
-                if (!f.test(operator.apply(sum, getType(l)))) {
-                    while (l < (rowSize - 1)) {
-                        l <<= 1;
-                        l++;
-                        if (f.test(operator.apply(sum, getType(l)))) {
-                            sum = operator.apply(sum, getType(l));
-                            l++;
-                        }
+                while ((k & 1) == 0) k >>= 1;
+                if (!f.test(operator.apply(sum, getType(k - 1)))) {
+                    while (k < rowSize) {
+                        k <<= 1;
+                        T next = operator.apply(sum, getType(k - 1));
+                        if (f.test(next)) { sum = next; k++; }
                     }
-                    return l - (rowSize - 1);
+                    return k - rowSize;
                 }
-                sum = operator.apply(sum, getType(l));
-                l++;
-            } while (((l + 1) & -(l + 1)) != (l + 1));
+                sum = operator.apply(sum, getType(k - 1));
+                k++;
+            } while ((k & -k) != k);
             return N;
         }
 
-
+        /**
+         * 単調な述語が真である最小の左端を O(log N) で求める。
+         * {@code 0 <= r <= N}、単位元に対して述語が真であることが必要。
+         */
         public int minLeft(int r, Predicate<T> f) {
-            if (r == 0) {
-                return 0;
-            }
-            r--;
-            r += (rowSize - 1);
-            T sum = null;
-            if (ie != null) {
-                sum = ie.get();
-            }
+            if (r == 0) return 0;
+            int k = r + rowSize;
+            T sum = ie == null ? null : ie.get();
             do {
-                while (r > 0 && r % 2 == 0) {
-                    r--;
-                    r >>= 1;
-                }
-                if (!f.test(operator.apply(getType(r), sum))) {
-                    while (r < (rowSize - 1)) {
-                        r <<= 1;
-                        r += 2;
-                        if (f.test(operator.apply(getType(r), sum))) {
-                            sum = operator.apply(getType(r), sum);
-                            r--;
-                        }
+                k--;
+                while (k > 1 && (k & 1) == 1) k >>= 1;
+                if (!f.test(operator.apply(getType(k - 1), sum))) {
+                    while (k < rowSize) {
+                        k = (k << 1) + 1;
+                        T next = operator.apply(getType(k - 1), sum);
+                        if (f.test(next)) { sum = next; k--; }
                     }
-                    return r + 1 - (rowSize - 1);
+                    return k + 1 - rowSize;
                 }
-                sum = operator.apply(getType(r), sum);
-                r--;
-            } while (((r + 1) & -(r + 1)) != (r + 1));
+                sum = operator.apply(getType(k - 1), sum);
+            } while ((k & -k) != k);
             return 0;
         }
 

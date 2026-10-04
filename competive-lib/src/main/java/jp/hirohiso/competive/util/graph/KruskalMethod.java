@@ -21,7 +21,13 @@ public class KruskalMethod {
         System.out.println(graph.answer());
     }
 
-    private static class Kruskal {
+    /**
+     * 無向グラフの最小全域森を求める Kruskal 法。
+     * <p>頂点は [0,N)。負辺・平行辺・自己ループに対応。非連結なら成分ごとの
+     * 最小全域木の重みを合計する。辺追加後に solve を一度呼び answer で総和を取得。
+     * 辺重みは int、総和は long。計算量 O(M log M)、領域 O(N+M)。</p>
+     */
+    static class Kruskal {
         private final int size;
         private final static Comparator<Edge> comp = Comparator.comparingInt(e -> e.cost);
         private final PriorityQueue<Edge> pq;
@@ -54,7 +60,7 @@ public class KruskalMethod {
         }
 
         public long answer() {
-            int result = 0;
+            long result = 0;
             for(Edge e:this.treeEdge){
                 result += e.cost;
             }

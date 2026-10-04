@@ -30,7 +30,13 @@ public class DualSegmentTreeMain {
     //双対セグメンテーション木
     //T : Data
     //U : Lazy
-    //todo: N == 1 の時うまく更新されない
+    /**
+     * 区間更新・一点取得用の双対セグメント木。
+     * <p>入力は非空配列。0始まり、apply は半開区間 {@code [start,end)}。
+     * composition(new,old) は old の後に new を適用する作用。非可換な作用も扱える。
+     * 構築 O(N)、更新と取得 O(log N)、領域 O(N)。mapping/id は作用とその単位元、
+     * e は未設定値の単位元。渡す関数は引数を破壊しないこと。</p>
+     */
     public static class DualSegmentTree<T, U> {
         //配列
         private Object[] array, lazy;
@@ -89,7 +95,8 @@ public class DualSegmentTreeMain {
             if (start <= l && r <= end) {
                 mergeLazy(k, f);
             } else {
-                //異なるなら子の要素を計算して,値を更新
+                // 子に進む前に古い作用を伝播し、更新の時系列を保つ。
+                push(k);
                 apply(start, end, k * 2 + 1, l, (l + r) / 2, f);
                 apply(start, end, k * 2 + 2, (l + r) / 2, r, f);
             }
@@ -100,13 +107,19 @@ public class DualSegmentTreeMain {
             setLazy(k, this.composition.apply(f, getLazy(k)));
         }
 
+        private void push(int k) {
+            U f = getLazy(k);
+            mergeLazy(2 * k + 1, f);
+            mergeLazy(2 * k + 2, f);
+            setLazy(k, id.get());
+        }
+
         public T get(int index) {
             var value = getType(index);
-            // 遅延評価を適用
-            for (int k = index + rowSize - 1; k > 0; k = (k - 1) / 2) {
+            for (int k = index + rowSize - 1; ; k = (k - 1) / 2) {
                 value = this.mapping.apply(getLazy(k), value);
+                if (k == 0) return value;
             }
-            return value;
         }
 
         @SuppressWarnings("unchecked")

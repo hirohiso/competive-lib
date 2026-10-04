@@ -18,6 +18,14 @@ public class LazySegmentTreeBottom {
     record Pair(int v, int n) {
     }
 
+    /**
+     * 区間作用と順序付き集約を行う反復型遅延セグメント木。
+     * <p>0始まり、区間は半開 {@code [left,right)}。構築 O(N)、更新・照会・
+     * 境界探索 O(log N)、全体集約 O(1)、領域 O(N)。
+     * composition(new,old) は「old の後に new」で、再帰版とは引数順が逆。
+     * mapping は集約と整合し、e/id は単位元。値と作用は不変とし equals が使えること。
+     * 境界探索の述語は単調で単位元に対して真であること。</p>
+     */
     public static class LazySegmentTree<T, U> {
         private final int n, size, log;
         private final T[] data;
@@ -73,8 +81,10 @@ public class LazySegmentTreeBottom {
             var rk = k << 1 | 1;
             data[lk] = mapping.apply(lazy[k], data[lk]);
             data[rk] = mapping.apply(lazy[k], data[rk]);
-            lazy[lk] = composition.apply(lazy[k], lazy[lk]);
-            lazy[rk] = composition.apply(lazy[k], lazy[rk]);
+            if (lk < n) {
+                lazy[lk] = composition.apply(lazy[k], lazy[lk]);
+                lazy[rk] = composition.apply(lazy[k], lazy[rk]);
+            }
             lazy[k] = id.get();
         }
 
@@ -90,7 +100,7 @@ public class LazySegmentTreeBottom {
                     push(lk >> i);
                 }
                 if (((rk >> i) << i) != rk) {
-                    push(rk >> i);
+                    push((rk - 1) >> i);
                 }
             }
         }
@@ -110,7 +120,7 @@ public class LazySegmentTreeBottom {
                     data[lki] = op.apply(data[lki << 1], data[lki << 1 | 1]);
                 }
                 if (((rk >> i) << i) != rk) {
-                    var rki = rk >> i;
+                    var rki = (rk - 1) >> i;
                     data[rki] = op.apply(data[rki << 1], data[rki << 1 | 1]);
                 }
             }
@@ -206,7 +216,7 @@ public class LazySegmentTreeBottom {
         }
 
         public int maxRight(int left, Predicate<T> predicate) {
-            if (left < 0 || left >= size) {
+            if (left < 0 || left > size) {
                 throw new IndexOutOfBoundsException("Index out of bounds: " + left);
             }
             if (!predicate.test(e.get())) {
@@ -249,11 +259,11 @@ public class LazySegmentTreeBottom {
                 return 0;
             }
             right += n;
-            pushTo(right);
+            pushTo(right - 1);
             T sum = e.get();
             do {
                 right--;
-                while ((right & 1) == 1) {
+                while (right > 1 && (right & 1) == 1) {
                     right >>= 1;
                 }
                 if (!predicate.test(op.apply(data[right], sum))) {

@@ -28,7 +28,14 @@ public class SlidingWindowAggregationMain {
 
 
     //モノイドTを載せたSWAG
-    private static class SlidingWindowAggregation<T> {
+    /**
+     * モノイドのキュー集約（SWAG）。
+     * <p>push で末尾追加、pop で先頭削除、cal で先頭から末尾への集約。
+     * 演算は結合的で e は単位元。非可換でもよい。空キューの cal は e、pop は非空時のみ。
+     * 要素数 N に対して領域 O(N)、push/pop は償却 O(1)、cal は O(1)。
+     * 演算は引数を破壊しないこと。</p>
+     */
+    static class SlidingWindowAggregation<T> {
 
         LinkedList<SlidingAggregationPair> front;
         LinkedList<SlidingAggregationPair> back;
@@ -67,7 +74,8 @@ public class SlidingWindowAggregationMain {
             if (back.isEmpty()) {
                 while (!front.isEmpty()) {
                     var p = front.pollLast();
-                    pushList(p.n, back);
+                    var sum = back.isEmpty() ? p.n : ope.apply(p.n, back.peekLast().sum);
+                    back.addLast(new SlidingAggregationPair(p.n, sum));
                 }
             }
             var x = back.pollLast();
@@ -79,8 +87,8 @@ public class SlidingWindowAggregationMain {
             var b = back.peekLast();
 
             return ope.apply(
-                    f != null ? f.sum : e.get(),
-                    b != null ? b.sum : e.get()
+                    b != null ? b.sum : e.get(),
+                    f != null ? f.sum : e.get()
             );
         }
 

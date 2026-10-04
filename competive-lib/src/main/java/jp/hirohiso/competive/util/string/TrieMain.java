@@ -13,6 +13,12 @@ public class TrieMain {
     }
 
     //valを乗せたTrie
+    /**
+     * 小文字英字 a～z をキーとする Trie 辞書。
+     * <p>add は完全一致キーの値を設定し、同じキーは上書きする。空文字列も可。
+     * get は完全一致の値、未登録なら null。接頭辞だけ一致しても値は返さない。
+     * 長さ L の操作は O(L)、領域は登録文字数の合計に比例する。</p>
+     */
     public static class Trie<T> {
         static class TrieNode<T> {
             TrieNode[] children = new TrieNode[26];

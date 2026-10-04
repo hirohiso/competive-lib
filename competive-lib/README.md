@@ -4,26 +4,46 @@
 
 **パッケージ**: `jp.hirohiso.competive.util`
 
-**総ファイル数**: 72個
+**総ファイル数**: 85個（本体Javaソース）
 
 ## ディレクトリ構造
 
 ```
 src/main/java/jp/hirohiso/competive/util/
-├── tree/       - ツリー/セグメント木系データ構造（12ファイル）
-├── graph/      - グラフアルゴリズム（16ファイル）
-├── math/       - 数学的計算と変換（24ファイル）
+├── tree/       - ツリー/セグメント木系データ構造（15ファイル）
+├── graph/      - グラフアルゴリズム（17ファイル）
+├── math/       - 数学的計算と変換（29ファイル）
 ├── string/     - 文字列処理アルゴリズム（8ファイル）
 ├── sequence/   - 数列と部分列処理（4ファイル）
 ├── range/      - 範囲管理と集約（4ファイル）
-└── examples/   - 使用例とテクニック（4ファイル）
+├── examples/   - 使用例とテクニック（5ファイル）
+├── set/        - 集合（2ファイル）
+└── heuristic/  - ヒューリスティック（1ファイル）
 ```
+
+## 開発・テスト
+
+リポジトリのルートにある Gradle Wrapper を使用します。Gradle のグローバルインストールは不要です。
+Java 21 をインストールし、初回はネットワークに接続して実行してください。
+
+```sh
+# リポジトリのルートで実行
+./gradlew check       # JUnit、JaCoCoレポート、カバレッジ閾値
+./gradlew pitest      # Mutation Testing（通常テストとは別実行）
+./gradlew stressTest  # 大入力のスモークテスト
+```
+
+Gradle 9.6.1、Java Toolchain 21、JUnit Jupiter 5.12.2 を使用します。
+Maven から移行済みで、ビルド設定はルートの `build.gradle` に集約しています。
+環境設定、対象30ライブラリ、仕様上の制約と計測結果は [TESTING.md](../TESTING.md) を参照してください。
 
 ---
 
 ## ライブラリ一覧
 
-### 1. tree - データ構造とツリー（12ファイル）
+以下は用途別の主要項目です。今回検証した30ファイルの一覧は [TESTING.md](../TESTING.md) に記載しています。
+
+### 1. tree - データ構造とツリー（15ファイル）
 
 | クラス名 | ファイル | 機能 |
 |---------|---------|------|
@@ -40,7 +60,7 @@ src/main/java/jp/hirohiso/competive/util/
 | SternBrocotTree | [SternBrocotTreeMain.java](src/main/java/jp/hirohiso/competive/util/tree/SternBrocotTreeMain.java) | スターンブロコット木 |
 | DualSegmentTree | [DualSegmentTreeMain.java](src/main/java/jp/hirohiso/competive/util/tree/DualSegmentTreeMain.java) | 双対セグメント木 |
 
-### 2. graph - グラフアルゴリズム（16ファイル）
+### 2. graph - グラフアルゴリズム（17ファイル）
 
 | クラス名 | ファイル | 機能 |
 |---------|---------|------|
@@ -58,10 +78,10 @@ src/main/java/jp/hirohiso/competive/util/
 | NamoriGraph | [NamoriGraphMain.java](src/main/java/jp/hirohiso/competive/util/graph/NamoriGraphMain.java) | 花火グラフ（Namori Graph） |
 | FlattenArrayIndexer | [FlattenArrayIndexerMAin.java](src/main/java/jp/hirohiso/competive/util/graph/FlattenArrayIndexerMAin.java) | 平坦化配列インデックス管理 |
 | ManhattanMst | [ManhattanMstMain.java](src/main/java/jp/hirohiso/competive/util/graph/ManhattanMstMain.java) | マンハッタン距離MST |
-| MinMaxFlow | [MinMaxFlowMain.java](src/main/java/jp/hirohiso/competive/util/graph/MinMaxFlowMain.java) | 最小最大フロー |
+| MinCostFlow | [MinCostFlowMain.java](src/main/java/jp/hirohiso/competive/util/graph/MinCostFlowMain.java) | 最小費用流 |
 | xxxFastSearch | [xxxFastSearchMain.java](src/main/java/jp/hirohiso/competive/util/graph/xxxFastSearchMain.java) | 高速探索アルゴリズム |
 
-### 3. math - 数学関連（24ファイル）
+### 3. math - 数学関連（29ファイル）
 
 | クラス名 | ファイル | 機能 |
 |---------|---------|------|
@@ -121,7 +141,7 @@ src/main/java/jp/hirohiso/competive/util/
 | SlidingWindowAggregation | [SlidingWindowAggregationMain.java](src/main/java/jp/hirohiso/competive/util/range/SlidingWindowAggregationMain.java) | スライディングウィンドウ集約 |
 | PriorityRangeSum | [PriorityRangeSumMain.java](src/main/java/jp/hirohiso/competive/util/range/PriorityRangeSumMain.java) | 優先度付き範囲和 |
 
-### 7. examples - 使用例とテクニック（4ファイル）
+### 7. examples - 使用例とテクニック（5ファイル）
 
 | クラス名 | ファイル | 機能 |
 |---------|---------|------|
@@ -145,15 +165,15 @@ src/main/java/jp/hirohiso/competive/util/
 
 ```java
 // 例: Union-Findを使用
-import jp.hirohiso.competive.util.tree.UnionFind;
+import jp.hirohiso.competive.util.tree.UnionFind.DisjointSetUnion;
 
-UnionFind uf = new UnionFind(n);
-uf.union(a, b);
-if (uf.isSame(a, b)) {
+DisjointSetUnion uf = new DisjointSetUnion(n);
+uf.mergeSet(a, b);
+if (uf.isSameSet(a, b)) {
     // 同じ集合
 }
 ```
 
 ---
 
-*最終更新: 2025-12-30*
+*最終更新: 2026-10-04*

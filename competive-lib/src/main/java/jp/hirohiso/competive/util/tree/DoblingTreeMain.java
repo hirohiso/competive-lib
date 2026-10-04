@@ -9,6 +9,12 @@ public class DoblingTreeMain {
 
     }
 
+    /**
+     * 無向木を構築し、指定した根に対する祖先・LCAを前処理する。
+     * <p>頂点は [0,N)、N は正。辺は連結で閉路のない木を形成すること。
+     * rootTree の構築・領域 O(N log N)、ancestor/lca は O(log N)。
+     * ancestor(v,0)=v、深さより上の祖先は -1。構築後は辺を変更しない。</p>
+     */
     class TreeBuilder {
         int N;
         ArrayList<LinkedList<Integer>> lists;

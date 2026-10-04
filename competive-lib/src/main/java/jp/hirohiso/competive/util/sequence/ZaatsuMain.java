@@ -11,7 +11,12 @@ public class ZaatsuMain {
     }
 
 
-    private static long[] arrayComp(long[] arr){
+    /**
+     * 値の大小関係を保つ0始まりの座標圧縮。
+     * <p>戻り値は入力順の順位。等しい値は同順位で順位に欠番はない。
+     * 空配列も可。入力配列は変更しない。時間 O(N log N)、領域 O(N)。</p>
+     */
+    static long[] arrayComp(long[] arr){
         var result = new long[arr.length];
         var temp = new long[arr.length][2];
         for (int i = 0; i < arr.length; i++) {

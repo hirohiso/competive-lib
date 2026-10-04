@@ -4,6 +4,13 @@ import java.util.Arrays;
 import java.util.function.LongFunction;
 import java.util.function.LongUnaryOperator;
 
+/**
+ * long 行列の演算と剰余付き累乗。
+ * <p>matrixPow は非空の正方行列、非負指数、2以上の法を対象にし、0乗は単位行列。
+ * 要素は非負で、積と加算が long に収まること。N次行列の累乗は O(N³ log指数)。
+ * Matrix は長方形行列の加算・乗算・要素変換を扱い、これらは新しい行列を返す。
+ * コンストラクタと Builder は配列をコピーしないため、構築後の入力変更に注意。</p>
+ */
 public class MatrixLib {
     public static void main(String[] args) {
         Matrix a = new Matrix.Builder(2, 2)

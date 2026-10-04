@@ -21,6 +21,11 @@ public class Sequence {
         System.out.println(result);
     }
 
+    /**
+     * 比較器に従う狭義の最長増加部分列を1つ復元する。
+     * <p>非空配列で要素は非null。比較器は null を全要素より大きく扱う必要がある
+     * （例：Comparator.nullsLast）。時間 O(N log N)、領域 O(N)。入力は変更しない。</p>
+     */
     public static class GenericsLIS<T> {
         //LIS 最長部分増加列
         T[] array;
@@ -88,6 +93,11 @@ public class Sequence {
         }
     }
 
+    /**
+     * 狭義の最長増加部分列を1つ復元する。
+     * <p>入力は非空の int 配列。重複値は長さを増やさず、戻り値は添字ではなく値の列。
+     * 時間 O(N log N)、領域 O(N)。同長の解が複数あればどれを返すかは保証しない。</p>
+     */
     public static class LongestIncreasingSubsequence {
         //LIS 最長部分増加列
         public static List<Integer> lis(int[] array) {
@@ -120,7 +130,7 @@ public class Sequence {
                     table[i] = dpi[point - 1];
                 }
             }
-            var tail = dpi[lb(dp, Integer.MAX_VALUE) - 1];
+            var tail = dpi[n - 1];
             var list = new LinkedList<Integer>();
             while (tail != -1) {
                 list.addFirst(array[tail]);

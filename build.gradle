@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'info.solidsoft.pitest' version '1.19.0'
+}
+
+repositories { mavenCentral() }
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+sourceSets {
+    main.java.srcDirs = ['competive-lib/src/main/java']
+    test.java.srcDirs = ['competive-lib/src/test/java']
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+dependencyLocking { lockAllConfigurations() }
+
+test {
+    useJUnitPlatform { excludeTags 'stress' }
+    testLogging { events 'failed'; exceptionFormat = 'full' }
+    finalizedBy jacocoTestReport
+}
+tasks.register('stressTest', Test) {
+    description = '大きな入力でスタック・計算量の問題を確認する'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform { includeTags 'stress' }
+}
+jacoco { toolVersion = '0.8.14' }
+
+// 使用例や旧実装を含めず、検証対象の内部クラスを明示する。
+def targets = file('quality-targets.txt').readLines().findAll { it && !it.startsWith('#') }
+def documentedSources = targets.collect {
+    def outer = it.tokenize('.').last().split('\\$')[0].replace('*', '')
+    outer == 'RangeSet' ? 'RangeSetMain' : outer
+}.toSet()
+javadoc {
+    source = sourceSets.main.allJava.matching {
+        include documentedSources.collect { "**/${it}.java" }
+    }
+    options.encoding = 'UTF-8'
+    options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PACKAGE
+    options.addBooleanOption('Xdoclint:all,-missing', true)
+}
+jacocoTestReport {
+    dependsOn test
+    reports { html.required = true; xml.required = true }
+    classDirectories.setFrom(sourceSets.main.output.asFileTree.matching {
+        include targets.collect { it.replace('.', '/') + '.class' }
+    })
+}
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    classDirectories.setFrom(jacocoTestReport.classDirectories)
+    violationRules {
+        rule {
+            limit { counter = 'LINE'; minimum = 0.90 }
+            limit { counter = 'BRANCH'; minimum = 0.85 }
+        }
+    }
+}
+check.dependsOn jacocoTestCoverageVerification, javadoc
+pitest {
+    pitestVersion = '1.19.1'
+    junit5PluginVersion = '1.2.3'
+    targetClasses = targets
+    targetTests = ['jp.hirohiso.competive.util.*']
+    excludedMethods = ['main', 'debug', 'toString']
+    excludedGroups = ['stress']
+    threads = 4
+    outputFormats = ['HTML', 'XML']
+    timestampedReports = false
+    mutators = ['DEFAULTS']
+    mutationThreshold = 80
+    jvmPath = javaToolchains.launcherFor(java.toolchain).get().executablePath.asFile.absolutePath
+}

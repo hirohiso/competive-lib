@@ -23,6 +23,12 @@ public class Dinic {
 
     //Dinic法の実装
     //蟻本pp194参照
+    /**
+     * 非負整数容量の有向グラフの最大流。
+     * <p>頂点は [0,N)、始点と終点は異なること。辺容量は int、流量の合計は long。
+     * solve は残余グラフを破壊的に更新し、再度呼ぶと追加分の流量を返す。
+     * 一般の計算量 O(N²M)、領域 O(N+M)。DFS は再帰なので深い経路はスタックに依存する。</p>
+     */
     public static class DinicFlow {
         //隣接リスト
         private List<Edge>[] edgeList;

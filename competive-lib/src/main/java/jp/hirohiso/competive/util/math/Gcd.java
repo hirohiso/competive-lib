@@ -7,6 +7,14 @@ public class Gcd {
 
     }
 
+    /**
+     * 整数算術の競プロ向け補助関数。
+     * <p>gcd は符号を除いた最大公約数（両方0は対象外）、lcm は正整数が対象。
+     * extgcd は非負整数を受け Bézout 係数を返す（係数も long）。
+     * CRT は正で互いに素な法、floor_sum は n,a,b が非負で m が正。
+     * powmod は非負の底・指数と2以上の法。全中間計算が使用する整数型に収まること。
+     * gcd/extgcd は O(log min(a,b))、floor_sum は O(log m)、powmod は O(log n)。</p>
+     */
     public static class MathUtil {
 
         public static long chineseRemainderTheorem(long[] x, long[] m) {
@@ -48,11 +56,11 @@ public class Gcd {
         }
 
         public static class ExtGcdPara {
-            int x;
-            int y;
+            long x;
+            long y;
 
             public ExtGcdPara swap() {
-                int temp = this.x;
+                long temp = this.x;
                 this.x = this.y;
                 this.y = temp;
 
@@ -111,8 +119,8 @@ public class Gcd {
                 a = b;
                 b = temp;
             }
-            para.x = (int) (x0);
-            para.y = (int) (y0);
+            para.x = x0;
+            para.y = y0;
 
             return (long) a;
         }

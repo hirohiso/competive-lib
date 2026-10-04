@@ -33,11 +33,10 @@ public class RollingHashMain {
     }
 
     /**
-     * 並び順のハッシュを扱うモノイド
-     * <p>
-     * 並びそのものは内部で保持しないため、逆元の作用は並びが一致している場合のみ有効
-     *
-     * @param v
+     * 連結・左右の部分列除去ができる長さ付きハッシュ。
+     * <p>applyR は右連結、applyL は左連結。rightInv/leftInv は実際の接尾辞/接頭辞を除く。
+     * E は空列。各操作 O(log N)、単一法のため衝突はあり得る。
+     * 基数 b と法 m は全ての値で共有されるため生成後に変更しないこと。</p>
      */
     record ShiftHash(long v, int size) {
         static long b = 37;//基数
@@ -160,6 +159,12 @@ public class RollingHashMain {
     }
 
 
+    /**
+     * 小文字英字列の多項式ハッシュ。
+     * <p>get は O(N)。iterator(str,size) は {@code 1 <= size <= str.length()} の
+     * 各連続部分文字列のハッシュを左から返す（全体 O(N)）。返す Iterable は一度だけ走査する。
+     * 単一法なので衝突はあり得る。同じハッシュだけで厳密な一致は保証しない。</p>
+     */
     public static class RollingHash {
         private long b = 3491;
         private long m = 999999937;
@@ -219,7 +224,7 @@ public class RollingHashMain {
                             var h = (long) (str.charAt(now - 1) - zero);
                             h *= bsize;
                             h %= m;
-                            hash -= h;
+                            hash = (hash - h + m) % m;
                             hash = shift(hash, (str.charAt(now + (size - 1)) - zero));
                             return hash;
                         }

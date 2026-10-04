@@ -45,6 +45,14 @@ public class RangeSetMain {
 record Range(long l, long r) {
 }
 
+/**
+ * 半開区間の和集合を重複・隣接のない区間集合として管理する。
+ * <p>挿入・削除区間は {@code Long.MIN_VALUE < l < r < Long.MAX_VALUE}。
+ * 端点の最小値・最大値は番兵に予約。get は包含区間または null を返す。
+ * getLeft は右端が x 以下の直近区間、getRight は左端が x より大きい直近区間で、
+ * 存在しなければ番兵を返す。remove は実際に削除された区間の集合を返す。
+ * 区間数 K、影響区間数 R に対し更新 O((R+1) log K)、get O(log K)、領域 O(K)。</p>
+ */
 class RangeSet {
     private TreeSet<Range> set;
 

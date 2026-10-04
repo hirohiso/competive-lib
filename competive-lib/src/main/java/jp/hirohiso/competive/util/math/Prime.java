@@ -5,6 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * 篩と素因数分解。
+ * <p>prime(n) は 0～n の素数判定表（true が素数）、spf(n) は最小素因数表を返す。
+ * 篩の時間は O(N log log N)、領域 O(N)。boolean 表での素因数分解は表を走査し、
+ * 表が対象整数の平方根までの素数を網羅すること。SPF版は表の範囲内の正整数が対象で
+ * O(log n)。1の素因数分解は空Map。0や負整数の分解は対象外。</p>
+ */
 public class Prime {
 
     public static void main(String[] args) {
@@ -22,12 +29,12 @@ public class Prime {
         boolean[] result = new boolean[n + 1];
         Arrays.fill(result, true);
         result[0] = false;
-        result[1] = false;
-        for (int i = 2; i < Math.sqrt(n); i++) {
+        if (n >= 1) result[1] = false;
+        for (int i = 2; i <= n / i; i++) {
             if (result[i] == false) {
                 continue;
             }
-            for (int j = 2; j * i < n; j++) {
+            for (int j = 2; j <= n / i; j++) {
                 result[j * i] = false;
             }
         }

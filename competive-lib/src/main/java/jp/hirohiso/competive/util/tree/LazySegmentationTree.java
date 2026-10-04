@@ -191,6 +191,13 @@ public class LazySegmentationTree {
     //遅延評価セグメンテーション木
     //T : Data
     //U : Lazy
+    /**
+     * 半開区間の更新と集約を行う再帰型遅延セグメント木。
+     * <p>構築 O(N)、apply/getRange は O(log N)、領域 O(N)。0始まりで
+     * {@code 0 <= start <= end <= N}。空区間の集約は e、更新は何もしない。
+     * composition(old,new) は「old の後に new」。mapping は集約と整合し、
+     * e/id は単位元、作用の同値性は equals で判定する。値と作用は不変として扱う。</p>
+     */
     public static class LazySegmentTree<T, U> {
         //配列
         private Object[] array, lazy;

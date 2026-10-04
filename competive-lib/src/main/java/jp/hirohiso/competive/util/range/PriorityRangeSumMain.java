@@ -35,89 +35,17 @@ public class PriorityRangeSumMain {
         }
     }
 
-    /*
-    //区間内の昇順top Kのみをsumする
-    private static class PriorityRangeSum {
 
-        private PriorityQueue<Long> inK;//K以内の要素集合
-        private PriorityQueue<Long> outK;//K超過の要素集合
-        private PriorityQueue<Long> del_inK;//inK内の遅延削除する要素集合;
-        private PriorityQueue<Long> del_outK;//outK内の遅延削除する要素集合;
-
-        private int sum = 0;
-        private int K;
-
-        public PriorityRangeSum(int K) {
-            this.inK = new PriorityQueue<>(Comparator.reverseOrder());
-            this.outK = new PriorityQueue<>();
-            this.del_inK = new PriorityQueue<>(Comparator.reverseOrder());
-            this.del_outK = new PriorityQueue<>();
-            this.K = K;
-        }
-
-        public void push(long x) {
-            inK.add(x);
-            sum += x;
-            if (sizeIn() > K) {
-                var n = peekIn();
-                sum -= n;
-                inK.poll();
-                outK.add(n);
-            }
-        }
-
-        public void pop(long x) {
-            if (x <= peekIn()) {
-                del_inK.add(x);
-                sum -= x;
-            } else {
-                del_outK.add(x);
-            }
-
-            if (sizeIn() < K && sizeOut() != 0) {
-                var n = peekOut();
-                sum += n;
-                outK.poll();
-                inK.add(n);
-            }
-        }
-
-        public long size() {
-            return this.sizeIn();
-        }
-
-        private int sizeIn() {
-            return this.inK.size() - this.del_inK.size();
-        }
-
-        private int sizeOut() {
-            return this.outK.size() - this.del_outK.size();
-        }
-
-        private long peekIn() {
-            while (del_inK.size() != 0 && del_inK.peek() == inK.peek()) {
-                del_inK.poll();
-                inK.poll();
-            }
-            return inK.peek();
-        }
-
-        private long peekOut() {
-            while (del_outK.size() != 0 && del_outK.peek() == outK.peek()) {
-                del_outK.poll();
-                outK.poll();
-            }
-            return outK.peek();
-        }
-
-        public long sum() {
-            return this.sum;
-        }
-    }
-    */
 
     //区間内の昇順top Kのみをsumする
-    private static class PriorityRangeSum {
+    /**
+     * 多重集合の小さい方から min(K,N) 個の和を保持する。
+     * <p>K は非負。push は追加、pop は存在する値を1個削除、updateK は選ぶ個数の変更。
+     * size は全要素数。値・中間和は long に収まること。遅延削除で重複値を扱う。
+     * push/pop は償却 O(log Q)、K の変更は移動数を D として O((D+1) log Q)。
+     * Q は操作数で、遅延削除のため領域も O(Q) になり得る。</p>
+     */
+    static class PriorityRangeSum {
 
         private PriorityQueue<Long> inK;//K以内の要素集合
         private PriorityQueue<Long> outK;//K超過の要素集合
@@ -207,7 +135,13 @@ public class PriorityRangeSumMain {
 
 
     //ジェネリクスversion
-    private static class PriorityRangeSumT<T> {
+    /**
+     * 比較順の先頭 min(K,N) 個を集約する固定Kの多重集合。
+     * <p>K は正。add/minus/zero は可換な加減算と単位元、比較と equals は整合すること。
+     * pop は存在する要素を1個削除する。size は全体ではなく選択中の個数を返す。
+     * 操作数 Q に対して操作は償却 O(log Q)、遅延削除を含む領域 O(Q)。</p>
+     */
+    static class PriorityRangeSumT<T> {
 
         private PriorityQueue<T> inK;//K以内の要素集合
         private PriorityQueue<T> outK;//K超過の要素集合
@@ -274,7 +208,7 @@ public class PriorityRangeSumMain {
         }
 
         private T peekIn() {
-            while (del_inK.size() != 0 && del_inK.peek() == inK.peek()) {
+            while (del_inK.size() != 0 && Objects.equals(del_inK.peek(), inK.peek())) {
                 del_inK.poll();
                 inK.poll();
             }
@@ -282,7 +216,7 @@ public class PriorityRangeSumMain {
         }
 
         private T peekOut() {
-            while (del_outK.size() != 0 && del_outK.peek() == outK.peek()) {
+            while (del_outK.size() != 0 && Objects.equals(del_outK.peek(), outK.peek())) {
                 del_outK.poll();
                 outK.poll();
             }

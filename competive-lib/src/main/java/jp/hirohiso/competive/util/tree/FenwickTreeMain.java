@@ -33,7 +33,13 @@ public class FenwickTreeMain {
         }
     }
 
-    private static class FenwickTree {
+    /**
+     * long の一点加算と区間和を扱う Fenwick Tree。
+     * <p>add の添字は {@code 0 <= x < N}。sum(i) は両端を含む [0,i] の和で
+     * sum(-1)=0。range は半開区間 [start,end) で空区間も可。
+     * 初期化 O(N)、操作 O(log N)、領域 O(N)。全ての中間和が long に収まること。</p>
+     */
+    static class FenwickTree {
         private final long[] arr;
         private final int size;
 
@@ -43,8 +49,8 @@ public class FenwickTreeMain {
         }
 
         /**
-         * @param x 0 <= x < N
-         * @param v
+         * @param x 更新する添字 {@code 0 <= x < N}
+         * @param v 加算する値
          */
         void add(int x, long v) {
             int i = x + 1;
@@ -55,12 +61,12 @@ public class FenwickTreeMain {
         }
 
         /**
-         * @param i 0 <= i < N
-         * @return
+         * @param i 含める右端 {@code -1 <= i < N}。-1なら単位元
+         * @return 指定範囲の和
          */
         long sum(int i) {
             i++;
-            var s = 0;
+            var s = 0L;
             while (i > 0) {
                 s += arr[i];
                 i -= i & -i;
@@ -69,16 +75,22 @@ public class FenwickTreeMain {
         }
 
         /**
-         * @param start 0 <= start < N
-         * @param end   0 < end <= N
-         * @return
+         * @param start 含む左端 {@code 0 <= start <= end}
+         * @param end 含まない右端 {@code start <= end <= N}
+         * @return 指定範囲の和
          */
         long range(int start, int end) {
             return sum(end - 1) - sum(start - 1);
         }
     }
 
-    private static class GenericFenwickTree<T> {
+    /**
+     * アーベル群上の Fenwick Tree。add/inv/e は群演算・逆元・単位元。
+     * <p>sum(i) は [0,i]、range(l,r) は [l,r)。0始まりで sum(-1)=e。
+     * 配列構築 O(N log N)、サイズ指定の構築 O(N)、操作 O(log N)、領域 O(N)。
+     * 演算は引数を変更せず、新しい値を返すこと。</p>
+     */
+    static class GenericFenwickTree<T> {
         Object[] arr;
 
         private final BinaryOperator<T> add;
@@ -86,13 +98,10 @@ public class FenwickTreeMain {
         private final Supplier<T> e;
 
         GenericFenwickTree(T[] a, BinaryOperator<T> add, UnaryOperator<T> inv, Supplier<T> e) {
-            this.arr = new Object[a.length + 1];
+            this(a.length, add, inv, e);
             for (int i = 0; i < a.length; i++) {
-                arr[i + 1] = a[i];
+                add(i, a[i]);
             }
-            this.add = add;
-            this.inv = inv;
-            this.e = e;
         }
 
         GenericFenwickTree(int N, BinaryOperator<T> add, UnaryOperator<T> minus, Supplier<T> e) {
@@ -106,8 +115,8 @@ public class FenwickTreeMain {
         }
 
         /**
-         * @param x 0 <= x < N
-         * @param v
+         * @param x 更新する添字 {@code 0 <= x < N}
+         * @param v 加算する値
          */
         void add(int x, T v) {
             for (int i = x + 1; i <= arr.length - 1; i += i & -i) {
@@ -116,7 +125,7 @@ public class FenwickTreeMain {
         }
 
         /**
-         * @param i 0 <= i < N
+         * @param i 含める右端 {@code -1 <= i < N}。-1なら単位元
          */
         T sum(int i) {
             var s = e.get();
@@ -129,9 +138,9 @@ public class FenwickTreeMain {
         }
 
         /**
-         * @param start 0 <= start < N
-         * @param end   0 < end <= N
-         * @return
+         * @param start 含む左端 {@code 0 <= start <= end}
+         * @param end 含まない右端 {@code start <= end <= N}
+         * @return 指定範囲の和
          */
         T range(int start, int end) {
             var r = sum(end - 1);

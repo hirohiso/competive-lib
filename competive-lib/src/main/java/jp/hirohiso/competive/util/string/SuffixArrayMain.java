@@ -41,6 +41,12 @@ public class SuffixArrayMain {
         System.out.println("IS:" + (double) sumIS / times);
     }
 
+    /**
+     * SA-IS 法による接尾辞配列。
+     * <p>sa は接尾辞を辞書順に並べた開始添字（0始まり）を返し、空の接尾辞は含まない。
+     * 空文字列も可。入力は各 UTF-16 char が {@code '$'} 以上であること。
+     * 最大文字値と '$' の差を σ として時間・領域 O(N+σ)。</p>
+     */
     public static class SuffixArray {
         static final int BASE = '$';
 
@@ -207,7 +213,11 @@ public class SuffixArrayMain {
         }
 
 
-        private static int[] lca(String str, int[] sa) {
+        /**
+         * 辞書順で直前の接尾辞とのLCP長を O(N) で求める。先頭の値は0。
+         * sa は str に対して sa(str) が返した配列を渡すこと。
+         */
+        static int[] lca(String str, int[] sa) {
             var size = str.length();
 
             var rank = new int[size];
