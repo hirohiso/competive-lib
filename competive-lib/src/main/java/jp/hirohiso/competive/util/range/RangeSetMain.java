@@ -8,7 +8,9 @@ import java.util.TreeSet;
 public class RangeSetMain {
     public static void main(String[] args) {
         var rangeSet = new RangeSet();
-        rangeSet.insert(new Range(1, 2));
+        rangeSet.insert(new Range(7, 30));
+        System.out.println(rangeSet);
+        rangeSet.insert(new Range(7, 27));
         System.out.println(rangeSet);
         System.out.println(rangeSet.get(0));
         System.out.println(rangeSet.get(1));
@@ -145,7 +147,7 @@ class RangeSet {
 
         if (range.l() <= pre.r()) {
             set.remove(pre);
-            range = new Range(pre.l(), range.r());
+            range = new Range(pre.l(), Math.max(range.r(), pre.r()));
         }
         while (range.r() >= next.l()) {
             set.remove(next);
