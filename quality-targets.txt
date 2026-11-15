@@ -1,4 +1,4 @@
-# 30ファイルの検証対象。$* は対象実装が利用する内部クラスも含む。
+# 33ファイルの検証対象。$* は対象実装が利用する内部クラスも含む。
 jp.hirohiso.competive.util.tree.UnionFind$DisjointSetUnion
 jp.hirohiso.competive.util.tree.UnionFind$PotentialDisjointSetUnion
 jp.hirohiso.competive.util.tree.UnionFind$WeightedDisjointSetUnion
@@ -6,6 +6,9 @@ jp.hirohiso.competive.util.tree.SegmentationTree$SegmentTree
 jp.hirohiso.competive.util.tree.LazySegmentationTree$LazySegmentTree
 jp.hirohiso.competive.util.tree.LazySegmentTreeBottom$LazySegmentTree
 jp.hirohiso.competive.util.tree.DualSegmentTreeMain$DualSegmentTree
+jp.hirohiso.competive.util.tree.DynamicSegmentationTree$DynamicSegmentTree*
+jp.hirohiso.competive.util.tree.DynamicLazySegmentationTree$DynamicLazySegmentTree*
+jp.hirohiso.competive.util.tree.DynamicDualSegmentTreeMain$DynamicDualSegmentTree*
 jp.hirohiso.competive.util.tree.FenwickTreeMain$*FenwickTree
 jp.hirohiso.competive.util.tree.SparseTableMain$SparseTable
 jp.hirohiso.competive.util.tree.DoblingTreeMain$TreeBuilder*

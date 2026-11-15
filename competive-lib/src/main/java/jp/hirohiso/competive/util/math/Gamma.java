@@ -1,5 +1,32 @@
 package jp.hirohiso.competive.util.math;
-
+/**
+ 026 * <p>
+ 027 * This is a utility class that provides computation methods related to the
+ 028 * &Gamma; (Gamma) family of functions.
+ 029 * </p>
+ 030 * <p>
+ 031 * Implementation of {@link #invGamma1pm1(double)} and
+ 032 * {@link #logGamma1p(double)} is based on the algorithms described in
+ 033 * <ul>
+ 034 * <li><a href="http://dx.doi.org/10.1145/22721.23109">Didonato and Morris
+ 035 * (1986)</a>, <em>Computation of the Incomplete Gamma Function Ratios and
+ 036 *     their Inverse</em>, TOMS 12(4), 377-393,</li>
+ 037 * <li><a href="http://dx.doi.org/10.1145/131766.131776">Didonato and Morris
+ 038 * (1992)</a>, <em>Algorithm 708: Significant Digit Computation of the
+ 039 *     Incomplete Beta Function Ratios</em>, TOMS 18(3), 360-373,</li>
+ 040 * </ul>
+ 041 * and implemented in the
+ 042 * <a href="http://www.dtic.mil/docs/citations/ADA476840">NSWC Library of Mathematical Functions</a>,
+ 043 * available
+ 044 * <a href="http://www.ualberta.ca/CNS/RESEARCH/Software/NumericalNSWC/site.html">here</a>.
+ 045 * This library is "approved for public release", and the
+ 046 * <a href="http://www.dtic.mil/dtic/pdf/announcements/CopyrightGuidance.pdf">Copyright guidance</a>
+ 047 * indicates that unless otherwise stated in the code, all FORTRAN functions in
+ 048 * this library are license free. Since no such notice appears in the code these
+ 049 * functions can safely be ported to Commons-Math.
+ 050 * </p>
+ 051 *
+ 052 */
 public class Gamma {
     /**
      * <a href="http://en.wikipedia.org/wiki/Euler-Mascheroni_constant">Euler-Mascheroni constant</a>

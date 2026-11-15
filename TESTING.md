@@ -32,13 +32,13 @@ IDEではルートのGradleプロジェクトを読み込み、テストもGradl
 
 ## テストの範囲
 
-本体85ファイルのうち、利用頻度と不具合の影響を重視した次の30ファイルを対象にした。
+本体88ファイルのうち、利用頻度と不具合の影響を重視した次の33ファイルを対象にした。
 期待値は、同じ実装の複製ではなく小規模な愚直解や数学的性質で求める。
 乱択は固定seedを使用し、失敗時の入力・操作位置を確認できるようにする。
 
 | 分野 | 対象ファイル（.java省略） | 主な期待値・ケース |
 |---|---|---|
-| tree（8） | UnionFind、SegmentationTree、LazySegmentationTree、LazySegmentTreeBottom、DualSegmentTreeMain、FenwickTreeMain、SparseTableMain、DoblingTreeMain | 連結成分の愚直管理、配列更新、全区間走査、親の逐次探索。1要素、2冪前後、非可換な作用、遅延値を残した連続操作 |
+| tree（11） | UnionFind、SegmentationTree、LazySegmentationTree、LazySegmentTreeBottom、DualSegmentTreeMain、DynamicSegmentationTree、DynamicLazySegmentationTree、DynamicDualSegmentTreeMain、FenwickTreeMain、SparseTableMain、DoblingTreeMain | 連結成分の愚直管理、配列更新、全区間走査、親の逐次探索。1要素、2冪前後、非可換な作用、遅延値を残した連続操作。動的版は負の添字と10^18規模の範囲を基本区間に分けて比較 |
 | graph（7） | DijkstraLight、Warshall、Scc、Dinic、MinCostFlowMain、KruskalMethod、DoublingMain | 独立したBellman–Ford、相互到達性、カット全列挙、容量全列挙、全域木全列挙、逐次遷移。非連結・平行辺・自己ループ・残余辺 |
 | range（3） | RangeSetMain、SlidingWindowAggregationMain、PriorityRangeSumMain | 小さい整数集合、キューの文字列連結、ソート後の先頭K個。隣接・分割・重複・K変更 |
 | string（5） | ZAlgorithmMain、ManacherMain、SuffixArrayMain、RollingHashMain、TrieMain | 直接文字比較、中心からの回文探索、suffixソートとLCP、独立した多項式ハッシュ、Map。周期・同一文字・接頭辞・上書き |
@@ -61,7 +61,7 @@ privateだったライブラリの入口は必要なものだけpackage-private�
 特に以下の違いを意識する。
 
 - 区間は原則半開区間。ただしFenwickのsum(i)は[0,i]、sum(-1)=0。
-- 再帰型遅延セグメント木のcompositionは(old,new)、反復型・双対木は(new,old)。
+- 再帰型遅延セグメント木のcompositionは(old,new)、反復型・双対木は(new,old)。動的版もそれぞれ同じ順序。
 - Sparse Tableの演算は冪等、Fenwickの汎用版と差分UnionFindはアーベル群。
 - Dijkstraは非負重み。Dinicと最小費用流は始点と終点が異なること。
   最小費用流の初期費用は非負。負閉路検出はWarshallで検証する。
@@ -120,7 +120,7 @@ SURVIVEDは正当入力での同値変異、計算量だけに影響する変異
 
 LCAの深さ調整は調査時に疑ったが、鎖・星・乱択木の全頂点対比較で失敗せず、実装変更はしていない。
 
-対象30ファイルのJavadocは `./gradlew javadoc` でも生成できる（`build/docs/javadoc/index.html`）。
+対象33ファイルのJavadocは `./gradlew javadoc` でも生成できる（`build/docs/javadoc/index.html`）。
 
 ## 計測結果
 
